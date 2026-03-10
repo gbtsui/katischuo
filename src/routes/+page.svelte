@@ -1,4 +1,7 @@
 <script>
+	import { resolve } from '$app/paths';
+
+	const resolvedLogin = resolve("/login");
 </script>
 
 <div> <!--document container and allat-->
@@ -15,7 +18,7 @@
 		κατισχύω: To overpower, to prevail, to be strong against, to overcome.
 	</div>
 
-	<div>
-		Login
-	</div>
+	<a href={resolvedLogin}>
+		login
+	</a>
 </div>
