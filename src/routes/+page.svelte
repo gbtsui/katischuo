@@ -1,5 +1,8 @@
 <script>
 	import { resolve } from '$app/paths';
+	import {authClient} from '$lib/auth-client.js';
+
+	const sesh = authClient.useSession()
 
 	const resolvedLogin = resolve("/login");
 </script>
@@ -21,4 +24,9 @@
 	<a href={resolvedLogin}>
 		login
 	</a>
+
+	<div>
+		current session:
+		{JSON.stringify(sesh)}
+	</div>
 </div>
