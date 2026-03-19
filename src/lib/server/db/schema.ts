@@ -71,3 +71,8 @@ export const trackedWeightDataPoint = pgTable("tracked_weight_data_point", {
 })
 
 export * from './auth.schema.ts';
+
+export type SelectExercise = typeof exercise.$inferSelect
+export type InsertExercise = typeof exercise.$inferInsert
+export type SelectSet = typeof set.$inferSelect
+export type InsertSet = typeof set.$inferInsert
