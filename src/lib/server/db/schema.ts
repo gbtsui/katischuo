@@ -2,8 +2,8 @@ import { pgTable, text, timestamp, uuid, numeric, pgEnum, boolean, integer } fro
 import { user } from './auth.schema';
 
 export const muscleGroupEnum = pgEnum("muscle_group", [
-	"chest", "back", "shoulders", "biceps", "triceps",
-	"legs", "glutes", "core", "cardio", "full_body", "other"
+	"chest", "upper_chest", "lats", "upper_back", "traps", "front_delts", "medial_delts", "rear_delts", "biceps", "triceps", "brachioradialis", "forearms", "rotator_cuffs",
+	"hip_adductors", "hip_abductors", "hip_flexors", "quads", "hamstrings", "calves", "glutes", "abs", "obliques", "cardio", "full_body", "other"
 ]);
 
 export const exerciseCategoryEnum = pgEnum("exercise_category", [
