@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { SelectExercise, type InsertSet } from '$lib/server/db/schema';
+	//import { SelectExercise, type InsertSet } from '$lib/server/db/schema';
+	import type {SelectExercise, InsertSet} from "$lib/types";
 
 	let {exercise, set}: {exercise: SelectExercise, set: Array<Partial<InsertSet>>} = $props()
 </script>

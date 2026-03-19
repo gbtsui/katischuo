@@ -5,7 +5,7 @@ import {
 	type InsertExercise,
 	muscleGroupEnum,
 	strengthExerciseEquipmentEnum
-} from '$lib/server/db/schema';
+} from '$lib/db/schema';
 import type { Actions } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { fail } from '@sveltejs/kit';
@@ -33,6 +33,9 @@ export const actions: Actions = {
 		const equipment = data.get('equipment');
 
 		if (!exerciseName || !category || !primaryMuscle.length) {
+			console.log(exerciseName);
+			console.log(category);
+			console.log(primaryMuscle)
 			return fail(400, { message: "missing required fields" });
 		}
 

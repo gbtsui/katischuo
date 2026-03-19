@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { InsertSet } from '$lib/server/db/schema';
+	import type { InsertSet } from '$lib/types';
 	import Exercise from '$lib/components/Exercise.svelte';
+	import type {PageData} from "./$types";
 
-	let { data } = $props();
-
+	let { data }: {data: PageData} = $props();
+	//actually die :broken_heart:
 	let loading = $state(true);
 	//let workoutNumber = $state(-1); //do i even need ts?
 	let templateName = $state('Empty Workout');
 
-	let workoutName = $derived(templateName);
 	let workoutNameSelected = $state(false);
 
 	let setArray: Array<Partial<InsertSet> > = $state([]);
@@ -53,7 +53,7 @@
 		<div class="w-[70vw] min-h-[50vh] bg-stone-800 border border-stone-700 flex flex-col">
 			<div class="w-[60vw] mx-[5vw] mt-[5vh] flex flex-col bg-stone-800 px-[2.5vw] py-[2.5vh] text-3xl"
 					 class:selected={workoutNameSelected}>
-				<input class="focus:outline-none focus:border-none" placeholder="workout name" bind:value={workoutName}
+				<input class="focus:outline-none focus:border-none" placeholder="workout name" bind:value={templateName}
 							 onfocusin={() => workoutNameSelected = true} onfocusout={() => workoutNameSelected = false} />
 				{#if workoutNameSelected}
 					selected
