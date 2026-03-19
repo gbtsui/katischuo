@@ -15,6 +15,13 @@
       "when": 1773236590712,
       "tag": "0001_yellow_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773885173428,
+      "tag": "0002_chilly_roland_deschain",
+      "breakpoints": true
     }
   ]
 }

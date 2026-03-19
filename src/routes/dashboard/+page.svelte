@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import idlePath from '$lib/assets/idle.GIF';
+	import { resolve } from '$app/paths';
 
 	let currentTime: Date = $state(new Date);
 
@@ -47,28 +48,31 @@
 			<img src={idlePath} alt="a really cool idle animation gif of ischyros" class="object-contain h-[40vh]" />
 
 			<!--also need to insert streaks, etc-->
-			<div class="w-full h-[10vh] flex flex-row gap-[2vw] items-center align-center justify-center ">
-				<!--streak counter-->
-				<div class="w-[10vh] h-[10vh] bg-stone-700 text-stone-100 flex flex-col justify-center items-center">
-					<div class="text-stone-500">streak</div>
-					<div class="text-3xl">
-						{streak}
+			<div class="flex flex-col items-center gap-[2.5vh]">
+				<div class="bg-stone-800 border border-stone-700 w-1/2 h-[4vh] text-xl justify-center flex items-center  text-center align-center">This Week</div>
+				<div class="w-full h-[10vh] flex flex-row gap-[2vw] items-center align-center justify-center">
+					<!--streak counter-->
+					<div class="w-[10vh] h-[10vh] bg-stone-700 text-stone-100 flex flex-col justify-center items-center">
+						<div class="text-stone-500">streak</div>
+						<div class="text-3xl">
+							{streak}
+						</div>
 					</div>
-				</div>
 
-				<!--weekly volume-->
-				<div class="w-[10vh] h-[10vh] bg-stone-700 text-stone-100 flex flex-col justify-center items-center">
-					<div class="text-stone-500">volume</div>
-					<div class="text-xl">
-						{volume}{volumeUnit}
+					<!--weekly volume-->
+					<div class="w-[10vh] h-[10vh] bg-stone-700 text-stone-100 flex flex-col justify-center items-center">
+						<div class="text-stone-500">volume</div>
+						<div class="text-xl">
+							{volume}{volumeUnit}
+						</div>
 					</div>
-				</div>
 
-				<!--cardio time-->
-				<div class="w-[10vh] h-[10vh] bg-stone-700 text-stone-100 flex flex-col justify-center items-center">
-					<div class="text-stone-500">cardio</div>
-					<div class="text-xl">
-						{cardioTimeHours}:{(cardioTimeMinutes < 10) ? `0${cardioTimeMinutes}` : cardioTimeMinutes}
+					<!--cardio time-->
+					<div class="w-[10vh] h-[10vh] bg-stone-700 text-stone-100 flex flex-col justify-center items-center">
+						<div class="text-stone-500">cardio</div>
+						<div class="text-xl">
+							{cardioTimeHours}:{(cardioTimeMinutes < 10) ? `0${cardioTimeMinutes}` : cardioTimeMinutes}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -83,9 +87,10 @@
 		<div class="w-[60vw] right-0 h-[100vh] flex">
 			<div class="w-[55vw] h-[90vh] ml-[5vw] my-[5vh] flex flex-col gap-[5vh] items-end overflow-hidden">
 				<!--track workout card thingy-->
-				<div
+				<a
 					class="right-0 w-[50vw] h-[20vh] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-col hover:translate-x-[-5vw] transition-all hover:border-emerald-400"
 					transition:fly={{x: "50vw", duration: 1000}}
+					href={resolve("/track")}
 				>
 					<div class="text-stone-500 text-4xl">
 						{currentHour}:{currentMinute}:{currentSecond}
@@ -93,12 +98,13 @@
 					<div class="text-5xl">
 						track workout
 					</div>
-				</div>
+				</a>
 
 				<!--track weight-->
-				<div
+				<a
 					class="right-0 w-[45vw] h-[15vh] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-col hover:translate-x-[-5vw] transition-all hover:border-emerald-400"
 					transition:fly={{x: "50vw", duration: 1000, delay: 67}}
+					href={resolve("/weight-manager")}
 				>
 					<div class="text-5xl">
 						<div class="text-stone-500 text-3xl">
@@ -106,7 +112,7 @@
 						</div>
 						<div>track weight</div>
 					</div>
-				</div>
+				</a>
 
 				<div
 					class="right-0 w-[45vw] h-[10vh]  text-center align-center items-center justify-center flex flex-row gap-[5vw]"
@@ -114,14 +120,24 @@
 				>
 					<!--history-->
 					<!--HOW DID I FORGET HISTORY???-->
-					<div class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl">
-						<div>History</div>
+					<div class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
+							 transition:fly={{x: "50vw", duration: 1000, delay: 67*2}}>
+						<div>history</div>
 					</div>
 
 					<!--PRs-->
 					<!--gladius roma belisarius sum.-->
-					<div class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl">
-						<div>PRs</div>
+					<div class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
+							 transition:fly={{x: "50vw", duration: 1000, delay: 67*3}}>
+						<div>records</div>
+					</div>
+				</div>
+
+				<div
+					class="right-0 w-[45vw] h-[15vh] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-col hover:translate-x-[-5vw] transition-all hover:border-emerald-400"
+					transition:fly={{x: "50vw", duration: 1000, delay: 67*4}}>
+					<div class="text-5xl">
+						stats
 					</div>
 				</div>
 
@@ -132,7 +148,7 @@
 				<!--settings-->
 				<div
 					class="right-0 h-[20vh] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-row gap-[2.5vw]">
-					<div class="text-5xl">
+					<div class="text-xl">
 						settings
 						<!--i might actually want to make this one smaller and just a cog?-->
 					</div>
