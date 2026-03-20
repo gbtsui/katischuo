@@ -1,22 +1,23 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { InsertSet } from '$lib/types';
+	import type { SelectExercise, InsertSet } from '$lib/types';
 	import Exercise from '$lib/components/Exercise.svelte';
 	import type {PageData} from "./$types";
 	import AddExercise from '$lib/components/AddExercise.svelte';
 
 	let { data }: {data: PageData} = $props();
-	//actually die :broken_heart:
 	let loading = $state(true);
-	//let workoutNumber = $state(-1); //do i even need ts?
 	let templateName = $state('Empty Workout');
 	let workoutNameSelected = $state(false);
 	let setArray: Array<Partial<InsertSet> > = $state([]);
 
 	type ExerciseGroup = {
-		exerciseId: string;
+		//exerciseId: string;
+		exercise: SelectExercise;
 		sets: Array<Partial<InsertSet>>;
 	}
+
+	const exerciseRecord: Record<string, SelectExercise> = Object.fromEntries(data.exercises.map(exercise => [exercise.id, exercise]));
 
 	function groupSequentialSets(sets: Array<Partial<InsertSet>>): Array<ExerciseGroup> {
 		return sets.reduce((acc, set) => {
@@ -25,7 +26,7 @@
 			if (last?.exerciseId === set.exerciseId) {
 				last.sets.push(set);
 			} else {
-				acc.push({ exerciseId: set.exerciseId!, sets: [set] });
+				acc.push({ exercise: exerciseRecord[set.exerciseId!]!, sets: [set] });
 			}
 
 			return acc;
@@ -60,9 +61,9 @@
 				{/if}
 			</div>
 
-			{#each exerciseWithSetsArray as exerciseData (exerciseData.exerciseId)}
-				<Exercise key={exerciseData.exerciseId} exercise={exerciseData.exerciseId} sets={exerciseData.sets} />
-			{/each}
+			{#each exerciseWithSetsArray as exerciseData (exerciseData)}
+				<Exercise exercise={exerciseData.exercise} sets={exerciseData.sets} />
+			{/each} <!--horrible and gross and disgusting and refactor this later-->
 
 			<AddExercise exercises={data.exercises} confirmAddExercise={(exercise) => {
 				const newSet: InsertSet = {

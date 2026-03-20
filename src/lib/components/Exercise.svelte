@@ -5,6 +5,10 @@
 	let {exercise, sets}: {exercise: SelectExercise, sets: Array<Partial<InsertSet>>} = $props()
 </script>
 
-<div class="h-[30vh] w-max bg-stone-900">
-		<div>{exercise.name}</div>
+<div class="h-[20vh] w-full bg-stone-900 text-stone-50">
+		<div>{exercise.exerciseName}</div>
+
+	{#each sets as set (set)}
+		<div>{JSON.stringify(set)}</div>
+	{/each}
 </div>
