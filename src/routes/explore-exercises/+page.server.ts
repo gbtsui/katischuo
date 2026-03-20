@@ -24,7 +24,9 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const session = locals.session
 
-		if (!session || !session.user) return fail(401, {message: "not signed in!!"})
+		console.log(session)
+
+		if (!session || !session.userId) return fail(401, {message: "not signed in!!"})
 
 		const exerciseName = data.get('exercise_name');
 		const category = data.get('category');
@@ -47,9 +49,13 @@ export const actions: Actions = {
 			secondaryMuscles: secondaryMuscles as typeof muscleGroupEnum.enumValues[number][],
 			equipment: equipment ? equipment as typeof strengthExerciseEquipmentEnum.enumValues[number] : null,
 			isCustom: true,
-			createdByUserId: session.user.id
+			createdByUserId: session.userId
 		};
 
+		console.log(newExercise)
+
 		await db.insert(exercise).values(newExercise);
+
+		return {success: true}
 	}
 };

@@ -1,12 +1,14 @@
 <script lang="ts">
-	let { data } = $props();
+	import {enhance} from '$app/forms';
+
+	let { data, form } = $props();
 	let { exerciseCategories, muscleGroups, equipment } = data;
 </script>
 
 <div>
 	<div>i am too lazy to style things right now but i will do it eventually astaghfirullah</div>
 
-	<form method="POST" action="?/create">
+	<form method="POST" action="?/create" use:enhance>
 		<div><input type="text" name="exercise_name" id="exercise_name" placeholder="exercise name" required /></div>
 		<div><select name="category" id="category" required>
 			{#each exerciseCategories as exerciseCategory (exerciseCategory)}
@@ -43,5 +45,13 @@
 		</div>
 
 		<button type="submit">create exercise</button>
+
+		{#if form?.success}
+			<p>Exercise created successfully!</p>
+		{/if}
+
+		{#if form?.message}
+			<p>Error: {form.message}</p>
+		{/if}
 	</form>
 </div>
