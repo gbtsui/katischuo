@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { SelectExercise, InsertSet } from "$lib/types";
+	import {weightUnitEnum} from "$lib/types"
 
-	let { exercise, sets, updateSet }: {
+	let { exercise, sets, updateSet, weightUnit }: {
 		exercise: SelectExercise;
 		sets: Array<Partial<InsertSet>>;
 		updateSet: (order: number, field: keyof InsertSet, value: number) => void;
+		weightUnit: weightUnitEnum.enumValues
 	} = $props();
 </script>
 
@@ -14,7 +16,7 @@
 	{#each sets as set (set.order)}
 		<div class="flex flex-row">
 			<div class="flex flex-col">
-				<div>weight</div>
+				<div>weight ({weightUnit})</div>
 				<input
 					type="number"
 					value={set.weight}

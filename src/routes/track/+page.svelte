@@ -48,7 +48,7 @@
 	});
 
 	$effect(() => {
-		console.log(exerciseWithSetsArray)
+		console.log(data.user_preferences)
 	})
 </script>
 
@@ -75,6 +75,7 @@
         setArray[idx] = { ...setArray[idx], [field]: value };
       }
     }}
+					weightUnit={data.user_preferences.weightUnit}
 				/>
 			{/each}
 
