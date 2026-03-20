@@ -3,7 +3,7 @@
 	import type { SelectExercise } from '$lib/db/schema';
 	import AddExerciseOption from '$lib/components/AddExerciseOption.svelte';
 
-	let { exercises }: { exercises: SelectExercise[] } = $props();
+	let { exercises, confirmAddExercise }: { exercises: SelectExercise[], confirmAddExercise: (exercise) => void } = $props();
 
 	let searchBarContents = $state("")
 	let filteredExercises = $derived(exercises.filter((element) => searchBarContents ? element.exerciseName.toLowerCase().includes(searchBarContents.toLowerCase()) : element))
@@ -26,6 +26,8 @@
 		+ Add Exercise
 	</button>
 </div>
+
+
 {#if modalOpen}
 	<div
 		class="absolute w-[100vw] h-[100vh] bg-stone-800/30 top-0 left-0 z-[10] flex justify-center align-center items-center overflow-hidden">
@@ -40,16 +42,17 @@
 		[&::-webkit-scrollbar]:mx-[1vw]
 ">
 				{#each filteredExercises as exercise (exercise.id)}
-					<AddExerciseOption exercise={exercise} onSelect={(ex) => selectedExercise = ex}/>
+					<AddExerciseOption exercise={exercise} currentlySelectedExercise={selectedExercise} onSelect={(ex) => selectedExercise = ex}/>
 				{/each}
 				{#if !exercises.length}
 					huh. looks like there's no exercises in the db matching your search... maybe create one?
 					{/if}
 			</div>
 
-			{#if selectedExercise !== null}
-				{selectedExercise}
-				{/if}
+			<div class="py-[2.5vh] text-center align-center {selectedExercise !== null ? 'bg-stone-100 text-stone-900 w-[25vw] cursor-pointer' : 'w-[20vw] bg-stone-900 text-stone-400 cursor-not-allowed'}  flex items-center justify-center transition-all" onclick={() => {modalOpen = false; confirmAddExercise(selectedExercise);}}>
+				add exercise
+			</div>
+
 		</div>
 	</div>
 {/if}

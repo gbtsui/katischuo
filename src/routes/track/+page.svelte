@@ -10,9 +10,7 @@
 	let loading = $state(true);
 	//let workoutNumber = $state(-1); //do i even need ts?
 	let templateName = $state('Empty Workout');
-
 	let workoutNameSelected = $state(false);
-
 	let setArray: Array<Partial<InsertSet> > = $state([]);
 
 	type ExerciseGroup = {
@@ -66,7 +64,13 @@
 				<Exercise key={exerciseData.exerciseId} exercise={exerciseData.exerciseId} sets={exerciseData.sets} />
 			{/each}
 
-			<AddExercise exercises={data.exercises} />
+			<AddExercise exercises={data.exercises} confirmAddExercise={(exercise) => {
+				const newSet: InsertSet = {
+					exerciseId: exercise.id,
+					order: setArray.length + 1,
+				}
+				setArray.push(newSet);
+			}}/>
 		</div>
 	</div>
 
