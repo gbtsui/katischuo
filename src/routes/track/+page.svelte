@@ -46,6 +46,10 @@
 		loading = false;
 		console.log(data.exercises);
 	});
+
+	$effect(() => {
+		console.log(exerciseWithSetsArray)
+	})
 </script>
 
 
@@ -61,18 +65,35 @@
 				{/if}
 			</div>
 
-			{#each exerciseWithSetsArray as exerciseData (exerciseData)}
-				<Exercise exercise={exerciseData.exercise} sets={exerciseData.sets} />
-			{/each} <!--horrible and gross and disgusting and refactor this later-->
+			{#each exerciseWithSetsArray as exerciseData (exerciseData.exercise.id)}
+				<Exercise
+					exercise={exerciseData.exercise}
+					sets={exerciseData.sets}
+					updateSet={(order, field, value) => {
+      const idx = setArray.findIndex(s => s.order === order);
+      if (idx !== -1) {
+        setArray[idx] = { ...setArray[idx], [field]: value };
+      }
+    }}
+				/>
+			{/each}
 
 			<AddExercise exercises={data.exercises} confirmAddExercise={(exercise) => {
 				const newSet: InsertSet = {
 					exerciseId: exercise.id,
 					order: setArray.length + 1,
+					weight: 0,
+					reps: 0,
+					rpe: null,
+					notes: "",
+					duration: 0
 				}
 				setArray.push(newSet);
 			}}/>
 		</div>
+
+
+
 	</div>
 
 {:else}
