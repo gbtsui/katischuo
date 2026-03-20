@@ -11,10 +11,11 @@ export const exerciseCategoryEnum = pgEnum("exercise_category", [
 ]);
 
 export const strengthExerciseEquipmentEnum = pgEnum("strength_exercise_type", [
-	"bodyweight", "machine", "cable", "barbell", "dumbbell", "other"
+	"bodyweight", "assisted", "timed", "distance", "machine", "cable", "barbell", "dumbbell", "other"
 ])
 
 export const weightUnitEnum = pgEnum("weight_unit", ["lbs", "kg"])
+export const distanceUnitEnum = pgEnum("distance_unit", ["km", "mi"])
 
 export const workout = pgTable("workout", {
 	id: uuid("id").primaryKey().defaultRandom(),
@@ -49,7 +50,8 @@ export const set = pgTable("set", {
 	reps: numeric("reps"),
 	rpe: numeric("rpe"), //light work no reaction.
 	notes: text("notes"),
-	duration: numeric("duration") //nullable, will not be shown unless it's duration-based?
+	duration: numeric("duration"), //nullable, will not be shown unless it's duration-based?
+	distance: numeric("distance"),
 })
 
 //removing cardioset so that i can just have a single set object
