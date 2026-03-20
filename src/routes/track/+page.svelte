@@ -3,6 +3,7 @@
 	import type { InsertSet } from '$lib/types';
 	import Exercise from '$lib/components/Exercise.svelte';
 	import type {PageData} from "./$types";
+	import AddExercise from '$lib/components/AddExercise.svelte';
 
 	let { data }: {data: PageData} = $props();
 	//actually die :broken_heart:
@@ -44,6 +45,7 @@
 	//but mashallah Christ resurrected after 3 days and trod down sin and my bad code underfoot! He is risen indeed!
 	onMount(() => {
 		loading = false;
+		console.log(data.exercises);
 	});
 </script>
 
@@ -64,6 +66,7 @@
 				<Exercise key={exerciseData.exerciseId} exercise={exerciseData.exerciseId} sets={exerciseData.sets} />
 			{/each}
 
+			<AddExercise exercises={data.exercises} />
 		</div>
 	</div>
 

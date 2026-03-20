@@ -14,9 +14,6 @@ export const load: PageServerLoad = async ({params, locals}) => {
 	const session = locals.session
 	console.log(session)
 	if (!session?.userId) return null
-
-	//do i *really* need userData?
-
 	return {
 		exercises: await db
 				.select()
