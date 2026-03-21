@@ -19,21 +19,34 @@
 
 	const exerciseRecord: Record<string, SelectExercise> = Object.fromEntries(data.exercises.map(exercise => [exercise.id, exercise]));
 
-	function groupSequentialSets(sets: Array<Partial<InsertSet>>): Array<ExerciseGroup> {
-		return sets.reduce((acc, set) => {
-			const last = acc[acc.length - 1];
+	function insertSetAtOrder(newSet: Partial<InsertSet>, targetOrder: number) {
+		const clampedOrder = Math.max(1, Math.min(targetOrder, setArray.length + 1));
 
-			if (last?.exerciseId === set.exerciseId) {
+		setArray = setArray.map(s =>
+			s.order! >= clampedOrder
+				? { ...s, order: s.order! + 1 }
+				: s
+		);
+
+		const setWithOrder: Partial<InsertSet> = { ...newSet, order: clampedOrder };
+
+		setArray.splice(clampedOrder - 1, 0, setWithOrder);
+
+		//trigger svelte react
+		setArray = [...setArray];
+	}
+
+	function groupSequentialSets(sets: Array<Partial<InsertSet>>): Array<ExerciseGroup> {
+		const sorted = [...sets].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+		return sorted.reduce((acc, set) => {
+			const last = acc[acc.length - 1];
+			if (last?.exercise.id === set.exerciseId) {
 				last.sets.push(set);
 			} else {
 				acc.push({ exercise: exerciseRecord[set.exerciseId!]!, sets: [set] });
 			}
-
 			return acc;
 		}, [] as Array<ExerciseGroup>);
-
-		//ughh make a function to fetch a list of exercises at the beginning and then convert it into a keyvalue pair
-		//
 	}
 
 	let exerciseWithSetsArray: Array<ExerciseGroup> = $derived(
@@ -65,7 +78,7 @@
 				{/if}
 			</div>
 
-			{#each exerciseWithSetsArray as exerciseData (exerciseData.exercise.id)}
+			{#each exerciseWithSetsArray as exerciseData, i (exerciseData.exercise.id + '-' + i)}
 				<Exercise
 					exercise={exerciseData.exercise}
 					sets={exerciseData.sets}
@@ -76,20 +89,20 @@
       }
     }}
 					weightUnit={data.user_preferences.weightUnit}
+					insertSetAtOrder={insertSetAtOrder}
 				/>
 			{/each}
 
 			<AddExercise exercises={data.exercises} confirmAddExercise={(exercise) => {
-				const newSet: InsertSet = {
+				const newSet: Partial<InsertSet> = {
 					exerciseId: exercise.id,
-					order: setArray.length + 1,
 					weight: 0,
 					reps: 0,
 					rpe: null,
 					notes: "",
 					duration: 0
 				}
-				setArray.push(newSet);
+				insertSetAtOrder(newSet, setArray.length+1)
 			}}/>
 		</div>
 
