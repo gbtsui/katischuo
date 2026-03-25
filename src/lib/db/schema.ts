@@ -27,7 +27,7 @@ export const workout = pgTable("workout", {
 	startTime: timestamp("start_time").notNull(),
 	endTime: timestamp("end_time").notNull(),
 	name: text("name"),
-	notes: text("name")
+	notes: text("notes")
 })
 
 export const exercise = pgTable("exercise", {

@@ -10,6 +10,7 @@
 	let templateName = $state('Empty Workout');
 	let workoutNameSelected = $state(false);
 	let setArray: Array<Partial<InsertSet> > = $state([]);
+	let workoutStartTime = $state(new Date())
 
 	type ExerciseGroup = {
 		//exerciseId: string;
@@ -74,12 +75,32 @@
 	$effect(() => {
 		console.log(data.user_preferences)
 	})
+
+	async function saveWorkout() {
+		const res = await fetch('/api/track-workout', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				name: templateName,
+				startTime: workoutStartTime.toISOString(),
+				endTime: new Date().toISOString(),
+				sets: setArray,
+			}),
+		});
+
+		const data = await res.json();
+		if (!data.success) {
+			console.error('Failed to save workout', data);
+		} else {
+			setArray = []
+		}
+	}
 </script>
 
 
 {#if !loading}
-	<div class="w-[100vw] min-h-[100vh] flex bg-stone-900 text-stone-50 items-center justify-center ">
-		<div class="w-[70vw] min-h-[50vh] bg-stone-800 border border-stone-700 flex flex-col">
+	<div class="w-[100vw] min-h-[100vh] flex bg-stone-900 text-stone-50 items-center justify-center align-center flex-col overflow-x-hidden">
+		<div class="w-[70vw] min-h-[50vh] bg-stone-800 border border-stone-700 flex flex-col justify-center align-center items-center">
 			<div class="w-[60vw] mx-[5vw] mt-[5vh] flex flex-col bg-stone-800 px-[2.5vw] py-[2.5vh] text-3xl"
 					 class:selected={workoutNameSelected}>
 				<input class="focus:outline-none focus:border-none" placeholder="workout name" bind:value={templateName}
@@ -116,11 +137,11 @@
 				}
 				insertSetAtOrder(newSet, setArray.length+1)
 			}}/>
-		</div>
 
 
-		<div>
-			<div>Save </div>
+			<button class="p-[2rem] max-w-1/2 text-2xl mt-[1rem] bg-stone-700" onclick={saveWorkout}>
+				Finish Workout
+			</button>
 		</div>
 	</div>
 
