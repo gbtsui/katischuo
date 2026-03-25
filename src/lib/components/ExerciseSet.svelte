@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
-	import type { InsertSet } from '$lib/db/schema';
 	import Icon from '@iconify/svelte';
+	import type { TrackingSet } from '$lib/types';
 
 	let { set, weightUnit, updateSet, deleteSetAtOrder }: {
-		set: Partial<InsertSet>,
+		set: Partial<TrackingSet>,
 		weightUnit: 'lbs' | 'kg',
-		updateSet: (order, field, value) => void,
+		updateSet: (order: number, field: keyof TrackingSet, value: number | string | boolean) => void,
 		deleteSetAtOrder: (targetOrder: number) => void
 	} = $props();
 
@@ -47,10 +47,29 @@
 		changeTypeDisplayOpen = false;
 		updateSet(set.order!, 'type', newType);
 	}
+
+	const handleRPE = (e) => {
+		const val = e.currentTarget.valueAsNumber;
+		updateSet(set.order!, 'rpe', isNaN(val) ? null : val);
+	};
+
+	const handleReps = (e) => {
+		const val = e.currentTarget.valueAsNumber;
+		updateSet(set.order!, 'reps', isNaN(val) ? null : val);
+	};
+
+	const handleWeight = (e) => {
+		const val = e.currentTarget.valueAsNumber;
+		updateSet(set.order!, 'weight', isNaN(val) ? null : toLbs(val));
+	};
+
+	const handleComplete = () => {
+		updateSet(set.order!, 'completed', !set.completed)
+	}
 </script>
-<div class="flex flex-row justify-between items-center mt-[1vh] mx-[2.5vw]">
-	<button class="text-stone-400 text-xl font-bold cursor-pointer p-[1rem] w-[1rem] select-none"
-			 onclick={() => changeTypeDisplayOpen = true}>
+<div class="flex flex-row justify-between items-center align-center content-center mt-[1vh] mx-[2.5vw] transition-all p-[1rem] {set.completed ? 'bg-emerald-900' : ''}">
+	<div class="text-stone-400 text-xl font-bold cursor-pointer p-[1rem] w-[1rem] select-none {set.type === 'normal' ? '' : (set.type === 'failure' ? 'text-red-500' : (set.type === 'drop' ? 'text-blue-500' : 'text-orange-400'))}"
+					onclick={() => changeTypeDisplayOpen = true}>
 		{typeDisplay}
 		{#if changeTypeDisplayOpen}
 			<div class="absolute flex flex-col bg-stone-100 text-stone-900 font-normal" onclick={(e) => e.stopPropagation()}>
@@ -68,41 +87,42 @@
 				</button>
 			</div>
 		{/if}
-	</button>
+	</div>
 
+	<div class="p-[0.5rem] rounded-sm transition-all {set.completed ? 'bg-emerald-400 text-stone-800' : ''}" onclick={handleComplete}>
+		{#if set.completed}
+			<Icon icon="material-symbols:check-box-outline"/>
+		{:else }
+			<Icon icon="material-symbols:check-box-outline-blank" />
+		{/if}
+	</div>
 
 	<div class="flex flex-col">
-		<div>weight ({weightUnit})</div>
+		<div class="select-none">weight ({weightUnit})</div>
 		<input
 			type="number"
 			value={toDisplay(set.weight ?? 0)}
-			oninput={(e) => {
-						const val = e.currentTarget.valueAsNumber;
-						updateSet(set.order!, 'weight', isNaN(val) ? null : toLbs(val));
-					}}
+			oninput={handleWeight}
 			class="text-center p-[1rem] w-[5rem] bg-stone-200 text-stone-900"
 		/>
 	</div>
 
 	<div class="flex flex-col">
-		<div>reps</div>
+		<div class="select-none">reps</div>
 		<input
 			type="number"
 			value={set.reps}
-			oninput={(e) => {
-						const val = e.currentTarget.valueAsNumber;
-						updateSet(set.order!, 'reps', isNaN(val) ? null : val);
-					}}
+			oninput={handleReps}
 			class="text-center p-[1rem] w-[5rem] bg-stone-200 text-stone-900"
 		/>
 
 	</div>
 
 	<div class="flex flex-col">
-		<div class="flex flex-row items-center align-center">
+		<div class="flex flex-row items-center align-center select-none">
 			RPE
 			<Icon icon="material-symbols:question-mark" onmouseout={() => showToolTip = false}
-						onmouseenter={() => showToolTip = true}/>
+						onmouseenter={() => showToolTip = true} />
 
 			{#if showToolTip}
 				<span class="text-xs absolute mb-[5vh] bg-stone-700 p-[1rem]" transition:fly>Rate of Perceived Exertion!</span>
@@ -111,17 +131,14 @@
 		<input
 			type="number"
 			value={set.rpe}
-			oninput={(e) => {
-						const val = e.currentTarget.valueAsNumber;
-						updateSet(set.order!, 'rpe', isNaN(val) ? null : val)
-					}}
+			oninput={handleRPE}
 			class="text-center p-[1rem] w-[5rem] bg-stone-200 text-stone-900"
 		/>
 	</div>
 
 	<div>
 		<button onclick={() => deleteSetAtOrder(set.order!)}>
-			<Icon class="cursor-pointer" icon="material-symbols:delete-outline"/>
+			<Icon class="cursor-pointer" icon="material-symbols:delete-outline" />
 		</button>
 		<!--todo: make this open a modal instead-->
 	</div>

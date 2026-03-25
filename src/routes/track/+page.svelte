@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { SelectExercise, InsertSet } from '$lib/types';
+	import type { SelectExercise, InsertSet, TrackingSet } from '$lib/types';
 	import Exercise from '$lib/components/Exercise.svelte';
 	import type {PageData} from "./$types";
 	import AddExercise from '$lib/components/AddExercise.svelte';
@@ -9,18 +9,21 @@
 	let loading = $state(true);
 	let templateName = $state('Empty Workout');
 	let workoutNameSelected = $state(false);
-	let setArray: Array<Partial<InsertSet> > = $state([]);
+	let setArray: Array<Partial<TrackingSet> > = $state([]);
 	let workoutStartTime = $state(new Date())
 
 	type ExerciseGroup = {
 		//exerciseId: string;
 		exercise: SelectExercise;
-		sets: Array<Partial<InsertSet>>;
+		sets: Array<Partial<TrackingSet>>;
 	}
+
+	//the full moon is rising :speaking_head:
+	//type TrackingSet = InsertSet & { completed?: boolean }
 
 	const exerciseRecord: Record<string, SelectExercise> = Object.fromEntries(data.exercises.map(exercise => [exercise.id, exercise]));
 
-	function insertSetAtOrder(newSet: Partial<InsertSet>, targetOrder: number) {
+	function insertSetAtOrder(newSet: Partial<TrackingSet>, targetOrder: number) {
 		const clampedOrder = Math.max(1, Math.min(targetOrder, setArray.length + 1));
 
 		setArray = setArray.map(s =>
@@ -29,13 +32,21 @@
 				: s
 		);
 
-		const setWithOrder: Partial<InsertSet> = { ...newSet, order: clampedOrder };
+		const setWithOrder: Partial<TrackingSet> = { ...newSet, order: clampedOrder };
 
 		setArray.splice(clampedOrder - 1, 0, setWithOrder);
 
 		//trigger svelte react
 		setArray = [...setArray];
 	}
+
+	function updateSet (order: number, field: keyof TrackingSet,  value: number | string | boolean) {
+		const idx = setArray.findIndex(s => s.order === order);
+		if (idx !== -1) {
+			setArray[idx] = { ...setArray[idx], [field]: value };
+		}
+	}
+	// ten thousand years apart...
 
 	function deleteSetAtOrder(targetOrder: number) {
 		setArray = setArray.filter(s => s.order !== targetOrder);
@@ -103,23 +114,15 @@
 		<div class="w-[70vw] min-h-[50vh] bg-stone-800 border border-stone-700 flex flex-col justify-center align-center items-center">
 			<div class="w-[60vw] mx-[5vw] mt-[5vh] flex flex-col bg-stone-800 px-[2.5vw] py-[2.5vh] text-3xl"
 					 class:selected={workoutNameSelected}>
-				<input class="focus:outline-none focus:border-none" placeholder="workout name" bind:value={templateName}
+				<input class="focus:outline-none focus:border-none bg-stone-700 p-[0.5rem]" placeholder="workout name" bind:value={templateName}
 							 onfocusin={() => workoutNameSelected = true} onfocusout={() => workoutNameSelected = false} />
-				{#if workoutNameSelected}
-					selected
-				{/if}
 			</div>
 
 			{#each exerciseWithSetsArray as exerciseData, i (exerciseData.exercise.id + '-' + i)}
 				<Exercise
 					exercise={exerciseData.exercise}
 					sets={exerciseData.sets}
-					updateSet={(order, field, value) => {
-      const idx = setArray.findIndex(s => s.order === order);
-      if (idx !== -1) {
-        setArray[idx] = { ...setArray[idx], [field]: value };
-      }
-    }}
+					updateSet={updateSet}
 					weightUnit={data.user_preferences.weightUnit}
 					insertSetAtOrder={insertSetAtOrder}
 					deleteSetAtOrder={deleteSetAtOrder}
@@ -127,19 +130,20 @@
 			{/each}
 
 			<AddExercise exercises={data.exercises} confirmAddExercise={(exercise) => {
-				const newSet: Partial<InsertSet> = {
+				const newSet: Partial<TrackingSet> = {
 					exerciseId: exercise.id,
 					weight: 0,
 					reps: 0,
 					rpe: null,
 					notes: "",
-					duration: 0
+					duration: 0,
+					completed: false
 				}
 				insertSetAtOrder(newSet, setArray.length+1)
 			}}/>
 
 
-			<button class="p-[2rem] max-w-1/2 text-2xl mt-[1rem] bg-stone-700" onclick={saveWorkout}>
+			<button class="p-[2rem] max-w-1/2 text-2xl my-[1rem] bg-stone-700" onclick={saveWorkout}>
 				Finish Workout
 			</button>
 		</div>

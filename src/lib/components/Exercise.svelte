@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SelectExercise, InsertSet } from '$lib/types';
+	import type { SelectExercise, TrackingSet } from '$lib/types';
 	import { weightUnitEnum } from '$lib/types';
 	import ExerciseSet from '$lib/components/ExerciseSet.svelte';
 
@@ -7,17 +7,16 @@
 
 	let { exercise, sets, updateSet, weightUnit, insertSetAtOrder, deleteSetAtOrder }: {
 		exercise: SelectExercise;
-		sets: Array<Partial<InsertSet>>;
-		updateSet: (order: number, field: keyof InsertSet, value: number) => void;
+		sets: Array<Partial<TrackingSet>>;
+		updateSet: (order: number, field: keyof TrackingSet, value: number | string | boolean) => void;
 		weightUnit: WeightUnit;
-		insertSetAtOrder: (newSet: Partial<InsertSet>, targetOrder: number) => void;
+		insertSetAtOrder: (newSet: Partial<TrackingSet>, targetOrder: number) => void;
 		deleteSetAtOrder: (targetOrder: number) => void;
 	} = $props();
 
-	console.log(sets)
 	function handleNewSet() {
 		const lastSet = sets[sets.length - 1];  // don't mutate with pop()
-		const newSet: Partial<InsertSet> = {
+		const newSet: Partial<TrackingSet> = {
 			exerciseId: lastSet?.exerciseId,
 			weight: 0,
 			reps: 0,
@@ -26,7 +25,8 @@
 			duration: 0,
 			type: "normal",
 			distance: 0,
-		};
+			completed: false
+		}; //fym these are strings??? theyre defined as numerics lil crotisserie
 		const targetOrder = (lastSet?.order ?? 0) + 1;
 		insertSetAtOrder(newSet, targetOrder);
 	}
