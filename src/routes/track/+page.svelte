@@ -36,6 +36,17 @@
 		setArray = [...setArray];
 	}
 
+	function deleteSetAtOrder(targetOrder: number) {
+		setArray = setArray.filter(s => s.order !== targetOrder);
+		setArray = setArray.map(s =>
+			s.order! >= targetOrder
+			? { ...s, order: s.order! - 1 }
+				: s
+		)
+
+		setArray = [...setArray];
+	}
+
 	function groupSequentialSets(sets: Array<Partial<InsertSet>>): Array<ExerciseGroup> {
 		const sorted = [...sets].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 		return sorted.reduce((acc, set) => {
@@ -90,6 +101,7 @@
     }}
 					weightUnit={data.user_preferences.weightUnit}
 					insertSetAtOrder={insertSetAtOrder}
+					deleteSetAtOrder={deleteSetAtOrder}
 				/>
 			{/each}
 
@@ -107,7 +119,9 @@
 		</div>
 
 
-
+		<div>
+			<div>Save </div>
+		</div>
 	</div>
 
 {:else}
