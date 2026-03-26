@@ -4,6 +4,7 @@
 	import Exercise from '$lib/components/Exercise.svelte';
 	import type {PageData} from "./$types";
 	import AddExercise from '$lib/components/AddExercise.svelte';
+	import FinishWorkout from '$lib/components/FinishWorkout.svelte';
 
 	let { data }: {data: PageData} = $props();
 	let loading = $state(true);
@@ -143,9 +144,7 @@
 			}}/>
 
 
-			<button class="p-[2rem] max-w-1/2 text-2xl my-[1rem] bg-stone-700" onclick={saveWorkout}>
-				Finish Workout
-			</button>
+			<FinishWorkout setArray={setArray} exerciseRecord={exerciseRecord} weightUnit={data.user_preferences.weightUnit}/>
 		</div>
 	</div>
 
