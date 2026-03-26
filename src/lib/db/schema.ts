@@ -81,3 +81,5 @@ export type SelectExercise = typeof exercise.$inferSelect
 export type InsertExercise = typeof exercise.$inferInsert
 export type SelectSet = typeof set.$inferSelect
 export type InsertSet = typeof set.$inferInsert
+export type SelectWorkout = typeof set.$inferSelect
+export type InsertWorkout = typeof set.$inferInsert
