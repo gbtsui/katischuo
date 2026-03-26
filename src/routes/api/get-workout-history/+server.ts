@@ -6,6 +6,7 @@ import { and, eq, or } from 'drizzle-orm';
 
 //lmao i just pasted the code into a +server.ts and screwed around a bit that's how easy it was :broken_heart:
 export const GET: RequestHandler = async ({locals}) => {
+	console.log("request for Get Workout History has been requested!!!! beep boop beep boop working now...")
 	const session = locals.session;
 	if (!session?.userId) error(401, 'unauthorized you silly billy');
 	//implement API key later?
@@ -44,6 +45,7 @@ export const GET: RequestHandler = async ({locals}) => {
 
 	const result = { allWorkouts, userPrefs: user_preferences[0] };
 
+	console.log("beep boop beep boop... result has been packaged and is about to be returned!")
 	return json({ success: true, data: result });
 }
 
