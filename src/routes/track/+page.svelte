@@ -12,8 +12,26 @@
 	//let templateName = $state('Empty Workout');
 	let workoutNameSelected = $state(false);
 	//let setArray: Array<Partial<TrackingSet> > = $state([]);
+	let now = $state(Date.now());
 
 	let {templateName, setArray, workoutStartTime} = $derived(TrackWorkoutState);
+
+	let timeElapsed = $derived(workoutStartTime ? now - workoutStartTime.getTime() : 0);
+	let timeElapsedMinutes = $derived(Math.max(0, Math.floor(timeElapsed / 1000 / 60)));
+	let timeElapsedSeconds = $derived(Math.max(0, Math.floor((timeElapsed / 1000) % 60)));
+	let formattedTime = $derived(`${String(timeElapsedMinutes).padStart(2, '0')}:${String(timeElapsedSeconds).padStart(2, '0')}`);
+
+	onMount(() => {
+		loading = false;
+		TrackWorkoutState.workoutStartTime = new Date();
+
+		const interval = setInterval(() => {
+			now = Date.now();
+		}, 1000);
+
+		return () => clearInterval(interval);
+	});
+
 	//let workoutStartTime = $state(new Date())
 
 	type ExerciseGroup = {
@@ -73,34 +91,19 @@
 
 	//Nietszche was right, God is dead and this code killed Him
 	//but mashallah Christ resurrected after 3 days and trod down sin and my bad code underfoot! He is risen indeed!
+	/*
 	onMount(() => {
 		loading = false;
 		console.log(data.exercises);
+		TrackWorkoutState.workoutStartTime = new Date();
 	});
 
 	$effect(() => {
 		console.log(data.user_preferences)
 	})
 
-	async function saveWorkout() {
-		const res = await fetch('/api/track-workout', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				name: templateName,
-				startTime: workoutStartTime.toISOString(),
-				endTime: new Date().toISOString(),
-				sets: setArray,
-			}),
-		});
+	 */
 
-		const data = await res.json();
-		if (!data.success) {
-			console.error('Failed to save workout', data);
-		} else {
-			setArray = []
-		}
-	}
 </script>
 
 
@@ -111,6 +114,7 @@
 					 class:selected={workoutNameSelected}>
 				<input class="focus:outline-none focus:border-none bg-stone-700 p-[0.5rem]" placeholder="workout name" bind:value={templateName}
 							 onfocusin={() => workoutNameSelected = true} onfocusout={() => workoutNameSelected = false} />
+				<div>{formattedTime}</div>
 			</div>
 
 			{#each exerciseWithSetsArray as exerciseData, i (exerciseData.exercise.id + '-' + i)}
