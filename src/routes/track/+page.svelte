@@ -5,13 +5,16 @@
 	import type {PageData} from "./$types";
 	import AddExercise from '$lib/components/AddExercise.svelte';
 	import FinishWorkout from '$lib/components/FinishWorkout.svelte';
+	import { TrackWorkoutState } from '$lib/store/state.svelte';
 
 	let { data }: {data: PageData} = $props();
 	let loading = $state(true);
-	let templateName = $state('Empty Workout');
+	//let templateName = $state('Empty Workout');
 	let workoutNameSelected = $state(false);
-	let setArray: Array<Partial<TrackingSet> > = $state([]);
-	let workoutStartTime = $state(new Date())
+	//let setArray: Array<Partial<TrackingSet> > = $state([]);
+
+	let {templateName, setArray, workoutStartTime} = $derived(TrackWorkoutState);
+	//let workoutStartTime = $state(new Date())
 
 	type ExerciseGroup = {
 		//exerciseId: string;
@@ -24,40 +27,31 @@
 
 	const exerciseRecord: Record<string, SelectExercise> = Object.fromEntries(data.exercises.map(exercise => [exercise.id, exercise]));
 
+
 	function insertSetAtOrder(newSet: Partial<TrackingSet>, targetOrder: number) {
-		const clampedOrder = Math.max(1, Math.min(targetOrder, setArray.length + 1));
+		const clampedOrder = Math.max(1, Math.min(targetOrder, TrackWorkoutState.setArray.length + 1));
 
-		setArray = setArray.map(s =>
-			s.order! >= clampedOrder
-				? { ...s, order: s.order! + 1 }
-				: s
+		const shifted = TrackWorkoutState.setArray.map(s =>
+			s.order! >= clampedOrder ? { ...s, order: s.order! + 1 } : s
 		);
-
-		const setWithOrder: Partial<TrackingSet> = { ...newSet, order: clampedOrder };
-
-		setArray.splice(clampedOrder - 1, 0, setWithOrder);
-
-		//trigger svelte react
-		setArray = [...setArray];
+		shifted.splice(clampedOrder - 1, 0, { ...newSet, order: clampedOrder });
+		TrackWorkoutState.setArray = [...shifted];
 	}
 
-	function updateSet (order: number, field: keyof TrackingSet,  value: number | string | boolean) {
-		const idx = setArray.findIndex(s => s.order === order);
+	function updateSet(order: number, field: keyof TrackingSet, value: number | string | boolean) {
+		const idx = TrackWorkoutState.setArray.findIndex(s => s.order === order);
 		if (idx !== -1) {
-			setArray[idx] = { ...setArray[idx], [field]: value };
+			TrackWorkoutState.setArray = TrackWorkoutState.setArray.map((s, i) =>
+				i === idx ? { ...s, [field]: value } : s
+			);
 		}
 	}
 	// ten thousand years apart...
 
 	function deleteSetAtOrder(targetOrder: number) {
-		setArray = setArray.filter(s => s.order !== targetOrder);
-		setArray = setArray.map(s =>
-			s.order! >= targetOrder
-			? { ...s, order: s.order! - 1 }
-				: s
-		)
-
-		setArray = [...setArray];
+		TrackWorkoutState.setArray = TrackWorkoutState.setArray
+			.filter(s => s.order !== targetOrder)
+			.map(s => s.order! > targetOrder ? { ...s, order: s.order! - 1 } : s);
 	}
 
 	function groupSequentialSets(sets: Array<Partial<InsertSet>>): Array<ExerciseGroup> {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SelectExercise, TrackingSet } from '$lib/types';
 	import { fly } from 'svelte/transition';
+	import { TrackWorkoutState } from '$lib/store/state.svelte';
 
 	let { setArray, exerciseRecord, weightUnit }: { setArray: Array<Partial<TrackingSet>>, exerciseRecord: Record<string, SelectExercise>, weightUnit: "lbs" | "kg" } = $props();
 	let modalOpen = $state(false);
@@ -8,6 +9,8 @@
 	let incompleteSets = $derived(
 		setArray.filter((set) => !set.completed)
 	);
+
+	let loading = $state(false)
 
 	$effect(() => console.log(setArray))
 
@@ -19,6 +22,29 @@
 		})
 
 		return newSetArray
+	}
+
+	const svbmitToSaveWorkout = async () => {
+		loading = true;
+		const res = await fetch('/api/track-workout', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				name: TrackWorkoutState.templateName,
+				startTime: TrackWorkoutState.startTime.toISOString(),
+				endTime: new Date().toISOString(),
+				sets: removeIncompleteSets(),
+			}),
+		});
+
+		const data = await res.json();
+		if (!data.success) {
+			console.error('Failed to save workout', data);
+			loading = false
+		} else {
+			//setArray = []
+			//ugh redirect i guess?
+		}
 	}
 </script>
 
@@ -36,7 +62,7 @@
 				 transition:fly={{y: "30vh"}}>
 			<div class="text-2xl py-[1vh]">Are you sure you're done with your workout?</div>
 
-			{#if incompleteSets}
+			{#if incompleteSets.length}
 				<div>
 					<div>You still have the following incomplete sets:</div>
 					<div>
@@ -47,13 +73,12 @@
 					<div>
 						These sets will be discarded if you choose to save now!
 					</div>
-
-					<div>
-						<button>Save Anyways</button>
-						<button>Nah, take me back</button>
-					</div>
 				</div>
 			{/if}
+			<div>
+				<button>{incompleteSets.length ? "Save Anyways" : "Save" }</button>
+				<button>Nah, take me back</button>
+			</div>
 		</div>
 	</div>
 {/if}
