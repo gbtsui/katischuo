@@ -4,6 +4,8 @@
 	import { exerciseCategoryEnum, muscleGroupEnum, strengthExerciseEquipmentEnum } from '$lib/db/schema';
 	import {fly} from 'svelte/transition';
 
+	let {onSuccess} = $props()
+
 	const exerciseCategories = exerciseCategoryEnum.enumValues
 	const muscleGroups = muscleGroupEnum.enumValues
 	const equipment = strengthExerciseEquipmentEnum.enumValues;
@@ -45,6 +47,7 @@
 				console.error(result.message) //帝王绿貔貅 趋吉避凶
 			} else {
 				successMessage = "exercise created successfully!"
+				onSuccess?.()
 				formRef.reset()
 				allRequiredFieldsFilled = false
 				setTimeout(() => {
@@ -69,7 +72,7 @@
 
 <!--le BOUTON!!!!!-->
 <div>
-	<button onclick={() => (modalOpen = true)} class="w-[10rem] h-[5rem] m-[1rem] bg-stone-800">
+	<button onclick={() => (modalOpen = true)} class="w-[10rem] h-[5rem] m-[1rem] bg-stone-800 cursor-pointer hover:w-[11rem] hover:m-[1.1rem] transition-all ">
 		+ Create Exercise
 	</button>
 </div>
@@ -89,7 +92,7 @@
 		<div class="w-[75vw] h-[80vh] flex flex-col bg-stone-800 shadow-lg overflow-y-auto p-6 gap-4" transition:fly>
 			<div class="flex justify-between items-center">
 				<h2 class="text-lg font-semibold">Create Exercise</h2>
-				<button onclick={closeModal} aria-label="Close">✕</button>
+				<button onclick={closeModal} aria-label="Close" class="hover:text-lg text-md cursor-pointer transition-all">close</button>
 			</div>
 
 			<form bind:this={formRef} oninput={checkRequiredFields} class="flex flex-col gap-4">
@@ -97,16 +100,26 @@
 					<label for="exercise_name">Exercise Name</label>
 					<input type="text" name="exercise_name" id="exercise_name" placeholder="Exercise name" required />
 				</div>
-
 				<div>
 					<label for="category">Category</label>
-					<select name="category" id="category" required class="bg-stone-800">
+					<select name="category" id="category" required class="bg-stone-800  cursor-pointer">
 						<!--style ts later -->
 						{#each exerciseCategories as category (category)}
-							<option value={category}>{category}</option>
+							<option value={category} class="hover:bg-stone-700">{category}</option>
 						{/each}
 					</select>
 				</div>
+
+				<div>
+					<label for="equipment">Equipment</label>
+					<select name="equipment" id="equipment" required class="bg-stone-800  cursor-pointer">
+						<option value="">---</option>
+						{#each equipment as item (item)}
+							<option value={item} class="hover:bg-stone-700">{item}</option>
+						{/each}
+					</select>
+				</div>
+
 
 				<fieldset>
 					<legend>Primary Muscle</legend>
@@ -127,16 +140,6 @@
 						</label>
 					{/each}
 				</fieldset>
-
-				<div>
-					<label for="equipment">Equipment</label>
-					<select name="equipment" id="equipment">
-						<option value="">None</option>
-						{#each equipment as item (item)}
-							<option value={item}>{item}</option>
-						{/each}
-					</select>
-				</div>
 			</form>
 
 			{#if successMessage}

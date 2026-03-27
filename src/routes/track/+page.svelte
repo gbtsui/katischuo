@@ -6,6 +6,7 @@
 	import AddExercise from '$lib/components/AddExercise.svelte';
 	import FinishWorkout from '$lib/components/FinishWorkout.svelte';
 	import { TrackWorkoutState } from '$lib/store/state.svelte';
+	import { resolve } from '$app/paths';
 
 	let { data }: {data: PageData} = $props();
 	let loading = $state(true);
@@ -20,6 +21,8 @@
 	let timeElapsedMinutes = $derived(Math.max(0, Math.floor(timeElapsed / 1000 / 60)));
 	let timeElapsedSeconds = $derived(Math.max(0, Math.floor((timeElapsed / 1000) % 60)));
 	let formattedTime = $derived(`${String(timeElapsedMinutes).padStart(2, '0')}:${String(timeElapsedSeconds).padStart(2, '0')}`);
+
+	let exercises = $state<SelectExercise[]>(data.exercises);
 
 	onMount(() => {
 		loading = false;
@@ -43,7 +46,7 @@
 	//the full moon is rising :speaking_head:
 	//type TrackingSet = InsertSet & { completed?: boolean }
 
-	const exerciseRecord: Record<string, SelectExercise> = Object.fromEntries(data.exercises.map(exercise => [exercise.id, exercise]));
+	const exerciseRecord: Record<string, SelectExercise> = Object.fromEntries(exercises.map(exercise => [exercise.id, exercise]));
 
 
 	function insertSetAtOrder(newSet: Partial<TrackingSet>, targetOrder: number) {
@@ -104,6 +107,12 @@
 
 	 */
 
+	const refreshExercises = async () => {
+		exercises = await fetch(resolve('/api/exercises'))
+			.then(res => res.json())
+			.then(res => res.data)
+	}
+
 </script>
 
 
@@ -128,7 +137,8 @@
 				/>
 			{/each}
 
-			<AddExercise exercises={data.exercises} confirmAddExercise={(exercise) => {
+			<AddExercise onExerciseCreated={refreshExercises}
+				confirmAddExercise={(exercise) => {
 				const newSet: Partial<TrackingSet> = {
 					exerciseId: exercise.id,
 					weight: 0,

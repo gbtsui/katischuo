@@ -4,18 +4,36 @@
 	import AddExerciseOption from '$lib/components/AddExerciseOption.svelte';
 	import CreateExerciseForm from '$lib/components/CreateExerciseForm.svelte';
 
-	let { exercises, confirmAddExercise }: { exercises: SelectExercise[], confirmAddExercise: (exercise) => void } = $props();
+	let { onExerciseCreated, confirmAddExercise }: {
+		onExerciseCreated: () => void,
+		confirmAddExercise: (exercise) => void
+	} = $props();
 
-	let searchBarContents = $state("")
-	let filteredExercises = $derived(exercises.filter((element) => searchBarContents ? element.exerciseName.toLowerCase().includes(searchBarContents.toLowerCase()) : element))
-
+	let searchBarContents = $state('');
+	let exercises = $state<SelectExercise[]>([]);
+	let filteredExercises = $derived(
+		Array.isArray(exercises)
+			? exercises.filter(el =>
+				searchBarContents
+					? el.exerciseName.toLowerCase().includes(searchBarContents.toLowerCase())
+					: true
+			)
+			: []
+	);
 	let modalOpen = $state(false);
-	let selectedExercise: SelectExercise | null = $state(null)
+	let selectedExercise: SelectExercise | null = $state(null);
 
-	console.log(filteredExercises)
+	const fetchExercises = async () => {
+		exercises = await fetch('/api/exercises/')
+			.then(res => res.json())
+			.then(res => res.data);
+		console.log(exercises)
+		onExerciseCreated()
+	};
 
 	function openModal() {
 		modalOpen = true;
+		fetchExercises(); //refetch every time modal opens?
 	}
 </script>
 <!--UNDETECTED UNEXPECTED WINGS OF GLORY TELL THEIR STORY AVIATION DEVIATION UNDETECTED STEALTH PERFECTED-->
@@ -33,11 +51,13 @@
 	<div
 		class="absolute w-[100vw] h-[100vh] bg-stone-800/30 top-0 left-0 z-[10] flex justify-center align-center items-center overflow-hidden">
 		<!--modal part-->
-		<div class="relative w-[70vw] h-[80vh] bg-stone-700 flex flex-col text-center items-center mt-[5vh]" transition:fly={{y: "30vh"}}>
+		<div class="relative w-[70vw] h-[80vh] bg-stone-700 flex flex-col text-center items-center mt-[5vh]"
+				 transition:fly={{y: "30vh"}}>
 			<div class="text-2xl py-[1vh]">Add Exercise</div>
 			<div>
-				<CreateExerciseForm/>
-				<input bind:value={searchBarContents} placeholder="Search for an exercise..." class="text-xl bg-stone-50 text-stone-900 p-[1vh]"/>
+				<CreateExerciseForm onSuccess={fetchExercises} />
+				<input bind:value={searchBarContents} placeholder="Search for an exercise..."
+							 class="text-xl bg-stone-50 text-stone-900 p-[1vh]" />
 			</div>
 			<div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-[2.5vh] h-[50vh] w-[50vw] justify-center items-center mt-[5vh]
 			[&::-webkit-scrollbar]:w-[1vw]
@@ -46,14 +66,17 @@
 		[&::-webkit-scrollbar]:mx-[1vw]
 ">
 				{#each filteredExercises as exercise (exercise.id)}
-					<AddExerciseOption exercise={exercise} currentlySelectedExercise={selectedExercise} onSelect={(ex) => selectedExercise = ex}/>
+					<AddExerciseOption exercise={exercise} currentlySelectedExercise={selectedExercise}
+														 onSelect={(ex) => selectedExercise = ex} />
 				{/each}
 				{#if !exercises.length}
 					huh. looks like there's no exercises in the db matching your search... maybe create one?
-					{/if}
+				{/if}
 			</div>
 
-			<div class="py-[2.5vh] text-center align-center {selectedExercise !== null ? 'bg-stone-100 text-stone-900 w-[25vw] cursor-pointer' : 'w-[20vw] bg-stone-900 text-stone-400 cursor-not-allowed'}  flex items-center justify-center transition-all" onclick={() => {modalOpen = false; confirmAddExercise(selectedExercise);}}>
+			<div
+				class="py-[2.5vh] text-center align-center {selectedExercise !== null ? 'bg-stone-100 text-stone-900 w-[25vw] cursor-pointer' : 'w-[20vw] bg-stone-900 text-stone-400 cursor-not-allowed'}  flex items-center justify-center transition-all"
+				onclick={() => {modalOpen = false; confirmAddExercise(selectedExercise);}}>
 				add exercise
 			</div>
 
