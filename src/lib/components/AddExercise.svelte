@@ -2,6 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import type { SelectExercise } from '$lib/db/schema';
 	import AddExerciseOption from '$lib/components/AddExerciseOption.svelte';
+	import CreateExerciseForm from '$lib/components/CreateExerciseForm.svelte';
 
 	let { exercises, confirmAddExercise }: { exercises: SelectExercise[], confirmAddExercise: (exercise) => void } = $props();
 
@@ -34,7 +35,10 @@
 		<!--modal part-->
 		<div class="relative w-[70vw] h-[80vh] bg-stone-700 flex flex-col text-center items-center mt-[5vh]" transition:fly={{y: "30vh"}}>
 			<div class="text-2xl py-[1vh]">Add Exercise</div>
-			<input bind:value={searchBarContents} placeholder="Search for an exercise..." class="text-xl bg-stone-50 text-stone-900 p-[1vh]"/>
+			<div>
+				<CreateExerciseForm/>
+				<input bind:value={searchBarContents} placeholder="Search for an exercise..." class="text-xl bg-stone-50 text-stone-900 p-[1vh]"/>
+			</div>
 			<div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-[2.5vh] h-[50vh] w-[50vw] justify-center items-center mt-[5vh]
 			[&::-webkit-scrollbar]:w-[1vw]
   [&::-webkit-scrollbar-track]:bg-stone-500
