@@ -39,7 +39,7 @@
 	}
 </script>
 
-<div class="flex flex-col w-[32.5vw] h-[4rem] hover:bg-stone-700 transition-all px-[0.5rem] cursor-pointer select-none {selectedWorkout?.id === workout.id ? 'bg-stone-300 text-stone-800' : ''}" onclick={() => setSelectedWorkout(workout)}>
+<div class="flex flex-col w-[32.5vw] h-[4rem]  transition-all px-[0.5rem] cursor-pointer select-none {selectedWorkout?.id === workout.id ? 'bg-stone-300 text-stone-800 hover:bg-stone-200' : 'hover:bg-stone-700'}" onclick={() => setSelectedWorkout(workout)}>
 	<div class="flex flex-row justify-between content-start">
 		<div class="text-lg">{workout.name}</div>
 		<div class="text-sm text-stone-400">{calculateHowManyDaysAgo(new Date(workout.startTime))}</div>
