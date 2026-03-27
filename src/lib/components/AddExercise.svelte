@@ -53,13 +53,18 @@
 		<!--modal part-->
 		<div class="relative w-[70vw] h-[80vh] bg-stone-700 flex flex-col text-center items-center mt-[5vh]"
 				 transition:fly={{y: "30vh"}}>
-			<div class="text-2xl py-[1vh]">Add Exercise</div>
-			<div>
+			<div class="flex flex-row w-full px-[2.5rem] py-[1rem] justify-between">
+				<div class="text-2xl py-[1vh]">Add Exercise</div>
+				<button onclick={() => modalOpen = false} aria-label="Close" class="hover:text-lg text-md cursor-pointer transition-all">close</button>
+
+			</div>
+
+			<div class="flex flex-row w-full px-[2.5rem] py-[1rem] justify-around items-center ">
 				<CreateExerciseForm onSuccess={fetchExercises} />
 				<input bind:value={searchBarContents} placeholder="Search for an exercise..."
-							 class="text-xl bg-stone-50 text-stone-900 p-[1vh]" />
+							 class="text-xl bg-stone-500 text-stone-900 p-[1vh] h-[2.5rem]" />
 			</div>
-			<div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-[2.5vh] h-[50vh] w-[50vw] justify-center items-center mt-[5vh]
+			<div class="overflow-y-scroll overflow-x-hidden flex flex-col gap-[2.5vh] h-[50vh] w-[50vw] justify-center items-center mt-[2.5vh] mb-[2.5vh] py-[2.5vh]
 			[&::-webkit-scrollbar]:w-[1vw]
   [&::-webkit-scrollbar-track]:bg-stone-500
   [&::-webkit-scrollbar-thumb]:bg-stone-800
