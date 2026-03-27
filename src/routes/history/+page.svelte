@@ -131,7 +131,7 @@
 												<span class="text-xs px-1 rounded bg-stone-600 text-stone-300">{set.type}</span>
 											{/if}
 											{#if set.weight && set.reps}
-												<span>{set.weight}{data.userPrefs.weightUnit} × {set.reps}</span>
+												<span>{set.weight}{data?.userPrefs.weightUnit} × {set.reps}</span>
 											{:else if set.duration}
 												<span>{set.duration}s</span>
 											{:else if set.distance}

@@ -15,7 +15,7 @@
 	//let setArray: Array<Partial<TrackingSet> > = $state([]);
 	let now = $state(Date.now());
 
-	let {templateName, setArray, workoutStartTime} = $derived(TrackWorkoutState);
+	let {setArray, workoutStartTime} = $derived(TrackWorkoutState);
 
 	let timeElapsed = $derived(workoutStartTime ? now - workoutStartTime.getTime() : 0);
 	let timeElapsedMinutes = $derived(Math.max(0, Math.floor(timeElapsed / 1000 / 60)));
@@ -115,13 +115,14 @@
 
 </script>
 
+<!--TODO: fix bug where it doesn't clear previous workout data when you save and then try to make a new workout-->
 
 {#if !loading}
 	<div class="w-[100vw] min-h-[100vh] flex bg-stone-900 text-stone-50 items-center justify-center align-center flex-col overflow-x-hidden">
 		<div class="w-[70vw] min-h-[50vh] bg-stone-800 border border-stone-700 flex flex-col justify-center align-center items-center">
 			<div class="w-[60vw] mx-[5vw] mt-[5vh] flex flex-col bg-stone-800 px-[2.5vw] py-[2.5vh] text-3xl"
 					 class:selected={workoutNameSelected}>
-				<input class="focus:outline-none focus:border-none bg-stone-700 p-[0.5rem]" placeholder="workout name" bind:value={templateName}
+				<input class="focus:outline-none focus:border-none bg-stone-700 p-[0.5rem]" placeholder="workout name" bind:value={TrackWorkoutState.templateName}
 							 onfocusin={() => workoutNameSelected = true} onfocusout={() => workoutNameSelected = false} />
 				<div>{formattedTime}</div>
 			</div>
@@ -146,7 +147,7 @@
 					rpe: null,
 					notes: "",
 					duration: 0,
-					completed: false
+					completed: false,
 				}
 				insertSetAtOrder(newSet, setArray.length+1)
 			}}/>
