@@ -1,15 +1,10 @@
 import type { PageServerLoad } from './$types';
 import {
-	exercise,
 	exerciseCategoryEnum,
-	type InsertExercise,
 	muscleGroupEnum,
 	strengthExerciseEquipmentEnum
 } from '$lib/db/schema';
-import type { Actions } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { fail } from '@sveltejs/kit';
-import { randomUUID } from 'crypto';
+
 
 export const load: PageServerLoad = async () => {
 	return {
@@ -19,8 +14,9 @@ export const load: PageServerLoad = async () => {
 	};
 };
 
+/*
 export const actions: Actions = {
-	create: async ({ request, locals }) => {
+	/*create: async ({ request, locals }) => {
 		const data = await request.formData();
 		const session = locals.session
 
@@ -58,4 +54,5 @@ export const actions: Actions = {
 
 		return {success: true}
 	}
-};
+	//TODO: UAGHHHHHH REFACTOR THIS TO USE THE NEW API ROUTE!!!
+};*/
