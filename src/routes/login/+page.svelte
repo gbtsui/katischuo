@@ -54,15 +54,15 @@
 	}
 </script>
 
-<div class="flex items-center justify-center w-[100vw] h-[100vh]">
+<div class="flex items-center justify-center w-[100vw] h-[100vh] bg-stone-900">
 	<div
-		class="flex flex-row p-5 bg-gray-100 md:w-2/3 md:h-2/3 items-center justify-center xs:w-5/6 xs:h-4/5 sm:w-3/4 xs:h-4/5 lg:w-1/2 lg:h-2/3">
+		class="flex flex-row p-5 bg-stone-800 text-stone-50 md:w-2/3 md:h-2/3 items-center justify-center xs:w-5/6 xs:h-4/5 sm:w-3/4 xs:h-4/5 lg:w-1/2 lg:h-2/3">
 		<div class="w-1/2">
 			{#if mode === "signup"}
 				<div transition:slide class="flex flex-col gap-2">
 					<div class="text-2xl w-1/2 ml-2">Sign Up</div>
 					<button onclick={() => mode = "login"}
-									class="text-start w-1/2 p-2 rounded-md cursor-pointer hover:bg-gray-800 hover:text-white transition-all">
+									class="text-start w-1/2 p-2 rounded-md cursor-pointer hover:bg-stone-900 bg-stone-700 hover:text-stone-50 transition-all">
 						already have an account?
 					</button>
 				</div>
@@ -70,7 +70,7 @@
 				<div transition:slide class="flex flex-col gap-2">
 					<div class="text-2xl w-1/2 ml-2">Login</div>
 					<button onclick={() => mode = "signup"}
-									class="text-start w-1/2 p-2 rounded-md cursor-pointer hover:bg-gray-800 hover:text-white transition-all">
+									class="text-start w-1/2 p-2 rounded-md cursor-pointer hover:bg-stone-900 bg-stone-700 hover:text-white transition-all">
 						don't have an account?
 					</button>
 				</div>
@@ -84,7 +84,7 @@
 							<input type="email" bind:value={email} placeholder="email" required class="text-end p-3" />
 							<input type="text" bind:value={name} placeholder="name" required class="text-end p-3" />
 							<input type="password" bind:value={password} placeholder="password" required class="text-end p-3" />
-							<button type="submit" class="text-end p-3 bg-gray-200 hover:bg-gray-800 hover:text-white transition-all cursor-pointer">
+							<button type="submit" class="text-end p-3 bg-stone-200 text-stone-900 hover:bg-gray-800 hover:text-white transition-all cursor-pointer">
 								Sign Up
 							</button>
 							{#if error}
@@ -101,7 +101,7 @@
 						<form onsubmit={handleSignin} class="flex flex-col gap-3 mr-2 items-end text-end">
 							<input type="email" bind:value={email} placeholder="email" required class="text-end p-3" />
 							<input type="password" bind:value={password} placeholder="password" required class="text-end p-3" />
-							<button type="submit" class="text-end p-3 bg-gray-200 hover:bg-gray-800 hover:text-white transition-all cursor-pointer">
+							<button type="submit" class="text-end p-3 bg-stone-200 text-stone-900 hover:bg-gray-800 hover:text-white transition-all cursor-pointer">
 								Login
 							</button>
 							{#if error}
