@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { SvelteMap } from 'svelte/reactivity';
+	import {fly} from 'svelte/transition';
 
-	let {workout, setSelectedWorkout, selectedWorkout} = $props()
+	let { workout, setSelectedWorkout, selectedWorkout, index } = $props();
 
 	function calculateHowManyDaysAgo(date: Date): string {
 		const now = new Date();
@@ -12,8 +13,8 @@
 		const diffMs = today.getTime() - target.getTime();
 		const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-		if (diffDays === 0) return "today";
-		if (diffDays === 1) return "yesterday";
+		if (diffDays === 0) return 'today';
+		if (diffDays === 1) return 'yesterday';
 		if (diffDays > 1) return `${diffDays} days ago`;
 
 		return `in ${Math.abs(diffDays)} days`;
@@ -39,7 +40,9 @@
 	}
 </script>
 
-<div class="flex flex-col w-[32.5vw] h-[4rem]  transition-all px-[0.5rem] cursor-pointer select-none {selectedWorkout?.id === workout.id ? 'bg-stone-300 text-stone-800 hover:bg-stone-200' : 'hover:bg-stone-700'}" onclick={() => setSelectedWorkout(workout)}>
+<div
+	class="flex flex-col w-[32.5vw] h-[4rem]  transition-all px-[0.5rem] cursor-pointer select-none {selectedWorkout?.id === workout.id ? 'bg-stone-300 text-stone-800 hover:bg-stone-200' : 'hover:bg-stone-700'}"
+	onclick={() => setSelectedWorkout(workout)} transition:fly={{delay: index*20}}>
 	<div class="flex flex-row justify-between content-start">
 		<div class="text-lg">{workout.name}</div>
 		<div class="text-sm text-stone-400">{calculateHowManyDaysAgo(new Date(workout.startTime))}</div>
@@ -55,13 +58,13 @@
 			{exercise.exercise.exerciseName}
 			-->
 
-			<!--
-			{#each exercise.sets as set (set)}
-				{set.order} - {set.weight}{userPrefs.weightUnit} x {set.reps} {set.rpe && `@ ${set.rpe}RPE`}
-				ugh add the logic here that checks what kind of exercise was actually tracked...
-			{/each}-->
+		<!--
+		{#each exercise.sets as set (set)}
+			{set.order} - {set.weight}{userPrefs.weightUnit} x {set.reps} {set.rpe && `@ ${set.rpe}RPE`}
+			ugh add the logic here that checks what kind of exercise was actually tracked...
+		{/each}-->
 
-			<!--actually? calculate what kind of focus this was (up to 2)-->
+		<!--actually? calculate what kind of focus this was (up to 2)-->
 		<!--{/each}-->
 	</div>
 </div>

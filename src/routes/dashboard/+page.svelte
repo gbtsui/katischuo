@@ -36,7 +36,7 @@
 	});
 </script>
 
-<div class="w-[100vw] h-[100vh] flex bg-stone-900 text-stone-50">
+<div class="w-[100vw] h-[100vh] flex bg-stone-900 text-stone-50 overflow-hidden">
 	<div class="w-[40vw] left-0 h-[100vh] flex">
 		<div class="mx-[5vw] my-[5vh] flex flex-col">
 			<div
@@ -120,10 +120,10 @@
 				>
 					<!--history-->
 					<!--HOW DID I FORGET HISTORY???-->
-					<div class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
-							 transition:fly={{x: "50vw", duration: 1000, delay: 67*2}}>
+					<a class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
+							 transition:fly={{x: "50vw", duration: 1000, delay: 67*2}} href={resolve("/history")}>
 						<div>history</div>
-					</div>
+					</a>
 
 					<!--PRs-->
 					<!--gladius roma belisarius sum.-->

@@ -2,6 +2,7 @@
 	//let {data} = $props()
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
+	import {fly} from 'svelte/transition';
 	import type { WorkoutWithExercises, SelectUserPreferences } from '$lib/types';
 	import HistoricalWorkoutListItem from '$lib/components/HistoricalWorkoutListItem.svelte';
 
@@ -28,14 +29,15 @@
 
 <div
 	class="flex items-center w-[100vw] h-[100vh] flex-col align-center justify-start overflow-hidden text-stone-50 bg-stone-900 ">
-	<div class="text-2xl h-[10vh] mt-[5vh]">Workout History</div>
+	<div class="text-2xl h-[10vh] mt-[5vh]" transition:fly>Workout History</div>
+	<a href={resolve("/dashboard")} class="absolute top-[2.5vh] left-0 w-[15vw] h-[3.5rem] bg-stone-700 text-center justify-center flex items-center hover:w-[17.5vw] hover:text-xl cursor-pointer transition-all ">Dashboard</a>
 
 	<div class="w-[80vw] h-[80vh] gap-[5vw] flex flex-row ">
 		<!--history section-->
 		<div class="w-[37.5vw] bg-stone-800 overflow-y-scroll 			[&::-webkit-scrollbar]:w-[1vw]
   [&::-webkit-scrollbar-track]:bg-stone-500
   [&::-webkit-scrollbar-thumb]:bg-stone-800
-		[&::-webkit-scrollbar]:mx-[1vw]">
+		[&::-webkit-scrollbar]:mx-[1vw]"  transition:fly={{delay: 67*2}}>
 			<div class="flex flex-col p-[1rem] gap-[0.5rem]">
 				{#if loading || !data?.userPrefs}
 					<div>Loading your workouts...</div>
@@ -43,10 +45,10 @@
 					{#if workouts.length === 0}
 						<div>Looks like you haven't tracked any workouts yet!</div>
 					{/if}
-					{#each workouts as workout (workout)}
+					{#each workouts as workout, index (workout)}
 						<HistoricalWorkoutListItem workout={workout}
 																			 setSelectedWorkout={(workout: WorkoutWithExercises) => selectedWorkout = workout}
-																			 selectedWorkout={selectedWorkout} />
+																			 selectedWorkout={selectedWorkout} index={index}/>
 					{/each}
 				{/if}
 			</div>
@@ -57,7 +59,7 @@
 		<div class="w-[37.5vw] bg-stone-800 overflow-y-scroll [&::-webkit-scrollbar]:w-[1vw]
 [&::-webkit-scrollbar-track]:bg-stone-500
 [&::-webkit-scrollbar-thumb]:bg-stone-800
-[&::-webkit-scrollbar]:mx-[1vw]">
+[&::-webkit-scrollbar]:mx-[1vw]" transition:fly={{delay: 67}}>
 			<div class="p-[2rem]">
 				{#if selectedWorkout}
 					{@const
