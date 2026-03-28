@@ -26,7 +26,7 @@
 
 	let loading = $state(false);
 
-	$effect(() => console.log(setArray));
+	//$effect(() => console.log(setArray));
 
 	const removeIncompleteSets = (): Array<Partial<TrackingSet>> => {
 		let newSetArray = setArray.filter((set) => set.completed);

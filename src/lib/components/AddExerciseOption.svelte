@@ -3,7 +3,7 @@
 
 	let { exercise, onSelect, currentlySelectedExercise } = $props();
 
-	console.log(exercise);
+	//console.log(exercise);
 
 	let hovered = $state(false);
 

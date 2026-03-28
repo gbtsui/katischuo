@@ -65,8 +65,8 @@
 
 	const handleComplete = () => {
 		updateSet(set.order!, 'completed', !set.completed)
-		console.log("handling complete")
-		console.log(set.completed)
+		//console.log("handling complete")
+		//console.log(set.completed)
 	}
 </script>
 <div class="flex flex-row justify-between items-center align-center content-center mt-[1vh] mx-[2.5vw] transition-all p-[1rem] {set.completed ? 'bg-emerald-900' : ''}">

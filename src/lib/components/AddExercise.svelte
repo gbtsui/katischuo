@@ -27,7 +27,7 @@
 		exercises = await fetch('/api/exercises/')
 			.then(res => res.json())
 			.then(res => res.data);
-		console.log(exercises)
+		//console.log(exercises)
 		onExerciseCreated()
 	};
 

@@ -26,7 +26,7 @@
 
 	onMount(() => {
 		loading = false;
-		TrackWorkoutState.workoutStartTime = new Date();
+		TrackWorkoutState.reset();
 
 		const interval = setInterval(() => {
 			now = Date.now();
@@ -114,8 +114,6 @@
 	}
 
 </script>
-
-<!--TODO: fix bug where it doesn't clear previous workout data when you save and then try to make a new workout-->
 
 {#if !loading}
 	<div class="w-[100vw] min-h-[100vh] flex bg-stone-900 text-stone-50 items-center justify-center align-center flex-col overflow-x-hidden">
