@@ -193,19 +193,23 @@
 </div>
 
 {#if deleteModalOpen}
-	<div class="fixed inset-0 bg-stone-900/20 flex items-center justify-center"
-			 onclick={(e) => { if (e.target === e.currentTarget) deleteModalOpen = false; }}>
+	<div class="fixed inset-0 bg-stone-900/50 flex items-center justify-center"
+			 onclick={(e) => { if (e.target === e.currentTarget) deleteModalOpen = false; }} transition:fly>
 
 		<div class="w-[75vw] h-[30vh] flex flex-col bg-stone-800 text-stone-200 shadow-lg overflow-y-auto p-6 gap-4"
 				 transition:fly>
 			<div class="flex flex-col justify-between h-full items-center">
-				<div>
-					<div class="text-xl">
-						Are you sure you want to delete this workout?
-					</div>
+				<div class="flex flex-row justify-between items-center w-full ">
 					<div>
-						This can't be undone!
+						<div class="text-xl">
+							Are you sure you want to delete this workout?
+						</div>
+						<div>
+							This can't be undone!
+						</div>
 					</div>
+
+					<button onclick={() => deleteModalOpen = false} class="cursor-pointer transition-all hover:text-lg">close</button>
 				</div>
 				{#if deletingInProgress}
 					<div>Deleting...</div>
