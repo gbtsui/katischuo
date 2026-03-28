@@ -7,10 +7,11 @@ import {
 	strengthExerciseEquipmentEnum
 } from '$lib/db/schema';
 import { db } from '$lib/server/db';
+import {eq, and, or} from 'drizzle-orm';
 
-type ExerciseCategory = typeof exerciseCategoryEnum.enumValues[number];
-type MuscleGroup = typeof muscleGroupEnum.enumValues[number];
-type Equipment = typeof strengthExerciseEquipmentEnum.enumValues[number];
+type ExerciseCategory = (typeof exerciseCategoryEnum.enumValues)[number];
+type MuscleGroup = (typeof muscleGroupEnum.enumValues)[number];
+type Equipment = (typeof strengthExerciseEquipmentEnum.enumValues)[number];
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	if (!locals.session?.userId) {
@@ -46,6 +47,25 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 			? (equipment as Equipment)
 			: null;
 
+	const existingExercises = await db
+		.select()
+		.from(exercise)
+		.where(
+			or(
+				and(
+					eq(exerciseName, exercise.exerciseName),
+					eq(locals.session.userId, exercise.createdByUserId)
+				),
+				and(
+					eq(exerciseName, exercise.exerciseName),
+					eq(exercise.isCustom, false)
+				)
+			)
+		);
+
+	if (existingExercises.length)
+		return error(409, 'already exists an exercise with that name, bucko');
+
 	const newExercise: InsertExercise = {
 		exerciseName,
 		category: category as ExerciseCategory,
@@ -53,7 +73,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		secondaryMuscles: validatedSecondary,
 		equipment: validatedEquipment,
 		isCustom: true,
-		createdByUserId: locals.session.userId,
+		createdByUserId: locals.session.userId
 	};
 
 	await db.insert(exercise).values(newExercise);
