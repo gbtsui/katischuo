@@ -3,8 +3,10 @@
 	import { resolve } from '$app/paths';
 	import type { SelectTrackedWeightDataPoint } from '$lib/db/schema.js';
 	import { onMount } from 'svelte';
-	import { Chart, Svg, Axis, Spline, Highlight, Tooltip} from 'layerchart';
-
+	import { Chart, Svg, Axis, Spline, Highlight, Tooltip, Area, Points } from 'layerchart';
+	import { formatDate, PeriodType } from '@layerstack/utils';
+	import {scaleTime} from "d3-scale"
+	import {curveCatmullRom} from 'd3-shape';
 
 	let weightRecords: SelectTrackedWeightDataPoint[] = $state([]);
 
@@ -18,6 +20,10 @@
 		date: new Date(r.createdAt),
 		value: Number(r.weight)
 	})));
+
+
+	let minVal = $derived(Math.min(...chartData.map(d => d.value)));
+	let padding = $derived((Math.max(...chartData.map(d => d.value)) - minVal) * 0.3);
 
 	const updateWeightRecords = async () => {
 		//const res = await fetch(resolve("/api/"))
@@ -84,27 +90,58 @@
 			</div>
 			<div class="w-[37.5vw] h-[30vh] bg-stone-800 p-[1rem]">
 				{#if chartData.length > 1}
-
 					<Chart
 						data={chartData}
 						x="date"
+						xScale={scaleTime()}
 						y="value"
 						yNice
-						padding={{left: 16, bottom: 24}}
-						tooltip={{mode: "bisect-x"}}>
+						yDomain={[minVal - padding, null]}
+						padding={{ left: 32, bottom: 28, right: 8, top: 8 }}
+						tooltip={{ mode: "bisect-x" }}>
 
 						<Svg>
-							<Axis placement="left" grid rule />
-							<Axis placement="bottom"
-										rule />
-							<Spline class="stroke-2 stroke-stone-50" />
-							<Highlight points lines />
+							<Axis
+								placement="left"
+								grid
+								rule={false}
+								ticks={4}
+								classes={{
+        //gridLine: "stroke-stone-700/40",
+        tick: "fill-stone-500 text-[11px]"
+      }} />
+							<Axis
+								placement="bottom"
+								rule={false}
+								format={(d) => formatDate(d, PeriodType.Month, { variant: "short" })}
+								ticks={5}
+								classes={{
+        tick: "fill-stone-500 text-[11px]"
+      }} />
+
+							<Area line={{ class: "stroke-stone-400 stroke-[1.5px]" }}
+										class="fill-stone-400/10" curve={curveCatmullRom}/>
+
+							<Spline class="stroke-[1.5px] stroke-stone-400 fill-none"
+											curve={curveCatmullRom}
+							/>
+							<Points class="stroke-stone-400 fill-stone-300"/>
+							<Highlight
+								points={{ class: "fill-stone-400 stroke-none r-[3]" }}
+								lines={{ class: "stroke-stone-600" }} />
 						</Svg>
 
-						<Tooltip.Root let:data>
-							<Tooltip.Header>{data.date}</Tooltip.Header>
+						<Tooltip.Root
+							class="bg-stone-800 border border-stone-700/50 rounded-md px-3 py-2 text-xs shadow-none"
+							let:data>
+							<Tooltip.Header class="text-stone-400 font-normal mb-1">
+								{formatDate(data.date, PeriodType.Day, { variant: "long" })}
+							</Tooltip.Header>
 							<Tooltip.List>
-								<Tooltip.Item label="value" value={data.value} />
+								<Tooltip.Item
+									label="weight"
+									value="{data.value} lbs"
+									class="text-stone-100 font-medium" />
 							</Tooltip.List>
 						</Tooltip.Root>
 					</Chart>
