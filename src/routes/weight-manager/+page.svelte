@@ -3,15 +3,21 @@
 	import { resolve } from '$app/paths';
 	import type { SelectTrackedWeightDataPoint } from '$lib/db/schema.js';
 	import { onMount } from 'svelte';
+	import { Chart, Svg, Axis, Spline, Highlight, Tooltip} from 'layerchart';
 
 
 	let weightRecords: SelectTrackedWeightDataPoint[] = $state([]);
 
 	let weightInput: number | null = $state(null);
 	let notesInput: string = $state('');
-	let weightUnitInput: "lbs" | "kg" = $state("lbs") //TODO: add function to query for actual preferred weight unit
+	let weightUnitInput: 'lbs' | 'kg' = $state('lbs'); //TODO: add function to query for actual preferred weight unit
 
 	let trackLoading = $state(false);
+
+	let chartData = $derived(weightRecords.map(r => ({
+		date: new Date(r.createdAt),
+		value: Number(r.weight)
+	})));
 
 	const updateWeightRecords = async () => {
 		//const res = await fetch(resolve("/api/"))
@@ -29,18 +35,18 @@
 			body: JSON.stringify({
 				weight: weightInput,
 				notes: notesInput,
-				weightUnit: weightUnitInput,
+				weightUnit: weightUnitInput
 			})
 		});
 		if (!res.ok) {
-			console.error(res)
+			console.error(res);
 		}
 
-		await updateWeightRecords()
+		await updateWeightRecords();
 		weightInput = null;
-		notesInput = "";
+		notesInput = '';
 
-		trackLoading = false
+		trackLoading = false;
 	};
 
 
@@ -76,8 +82,36 @@
 					{/if}
 				</div>
 			</div>
-			<div class="w-[37.5vw] h-[30vh] bg-stone-800">
-				graph goes here
+			<div class="w-[37.5vw] h-[30vh] bg-stone-800 p-[1rem]">
+				{#if chartData.length > 1}
+
+					<Chart
+						data={chartData}
+						x="date"
+						y="value"
+						yNice
+						padding={{left: 16, bottom: 24}}
+						tooltip={{mode: "bisect-x"}}>
+
+						<Svg>
+							<Axis placement="left" grid rule />
+							<Axis placement="bottom"
+										rule />
+							<Spline class="stroke-2 stroke-stone-50" />
+							<Highlight points lines />
+						</Svg>
+
+						<Tooltip.Root let:data>
+							<Tooltip.Header>{data.date}</Tooltip.Header>
+							<Tooltip.List>
+								<Tooltip.Item label="value" value={data.value} />
+							</Tooltip.List>
+						</Tooltip.Root>
+					</Chart>
+				{:else}
+					<div class="text-stone-400 text-sm">not enough data to graph</div>
+				{/if}
+
 			</div>
 		</div>
 
