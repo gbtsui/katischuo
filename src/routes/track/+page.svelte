@@ -2,20 +2,22 @@
 	import { onMount } from 'svelte';
 	import type { SelectExercise, InsertSet, TrackingSet } from '$lib/types';
 	import Exercise from '$lib/components/Exercise.svelte';
-	import type {PageData} from "./$types";
+	import type { PageData } from './$types';
 	import AddExercise from '$lib/components/AddExercise.svelte';
 	import FinishWorkout from '$lib/components/FinishWorkout.svelte';
 	import { TrackWorkoutState } from '$lib/store/state.svelte';
 	import { resolve } from '$app/paths';
+	import { fly } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 
-	let { data }: {data: PageData} = $props();
+	let { data }: { data: PageData } = $props();
 	let loading = $state(true);
 	//let templateName = $state('Empty Workout');
 	let workoutNameSelected = $state(false);
 	//let setArray: Array<Partial<TrackingSet> > = $state([]);
 	let now = $state(Date.now());
 
-	let {setArray, workoutStartTime} = $derived(TrackWorkoutState);
+	let { setArray, workoutStartTime } = $derived(TrackWorkoutState);
 
 	let timeElapsed = $derived(workoutStartTime ? now - workoutStartTime.getTime() : 0);
 	let timeElapsedMinutes = $derived(Math.max(0, Math.floor(timeElapsed / 1000 / 60)));
@@ -23,6 +25,7 @@
 	let formattedTime = $derived(`${String(timeElapsedMinutes).padStart(2, '0')}:${String(timeElapsedSeconds).padStart(2, '0')}`);
 
 	let exercises = $state<SelectExercise[]>(data.exercises);
+	let discardWorkoutModalOpen = $state(false);
 
 	onMount(() => {
 		loading = false;
@@ -67,6 +70,7 @@
 			);
 		}
 	}
+
 	// ten thousand years apart...
 
 	function deleteSetAtOrder(targetOrder: number) {
@@ -86,6 +90,11 @@
 			}
 			return acc;
 		}, [] as Array<ExerciseGroup>);
+	}
+
+	function handleDiscardWorkout() {
+		TrackWorkoutState.reset();
+		goto(resolve('/dashboard'));
 	}
 
 	let exerciseWithSetsArray: Array<ExerciseGroup> = $derived(
@@ -110,17 +119,57 @@
 	const refreshExercises = async () => {
 		exercises = await fetch(resolve('/api/exercises'))
 			.then(res => res.json())
-			.then(res => res.data)
-	}
+			.then(res => res.data);
+	};
 
 </script>
 
+{#if discardWorkoutModalOpen}
+	<div class="fixed inset-0 bg-stone-900/50 flex items-center justify-center"
+			 onclick={(e) => { if (e.target === e.currentTarget) discardWorkoutModalOpen = false; }} transition:fly>
+
+		<div class="w-[75vw] h-[30vh] flex flex-col bg-stone-800 text-stone-200 shadow-lg overflow-y-auto p-6 gap-4"
+				 transition:fly>
+			<div class="flex flex-col justify-between h-full items-center">
+				<div class="flex flex-row justify-between items-center w-full ">
+					<div>
+						<div class="text-xl">
+							Are you sure you want to discard this workout?
+						</div>
+						<div>
+							This can't be undone and you'll lose all your progress!
+						</div>
+					</div>
+
+					<button onclick={() => discardWorkoutModalOpen = false} class="cursor-pointer transition-all hover:text-lg">
+						close
+					</button>
+				</div>
+
+				<div>
+					<button onclick={handleDiscardWorkout}
+									class="m-[0.5rem] p-[1rem] bg-red-600 cursor-pointer hover:text-lg transition-all">I'm tired, boss.
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
 {#if !loading}
-	<div class="w-[100vw] min-h-[100vh] flex bg-stone-900 text-stone-50 items-center justify-center align-center flex-col overflow-x-hidden">
-		<div class="w-[70vw] min-h-[50vh] bg-stone-800 border border-stone-700 flex flex-col justify-center align-center items-center">
+	<div
+		class="w-[100vw] min-h-[100vh] flex bg-stone-900 text-stone-50 items-center justify-center align-center flex-col overflow-x-hidden">
+		<button
+			onclick={() => discardWorkoutModalOpen = true}
+			class="absolute top-[5rem] left-0 w-[12rem] h-[5rem] p-[2rem] hover:p-[2.5rem] transition-all cursor-pointer hover:text-lg bg-stone-700 flex justify-center items-center text-center">
+			Discard Workout
+		</button>
+		<div
+			class="w-[70vw] min-h-[50vh] bg-stone-800 border border-stone-700 flex flex-col justify-center align-center items-center">
 			<div class="w-[60vw] mx-[5vw] mt-[5vh] flex flex-col bg-stone-800 px-[2.5vw] py-[2.5vh] text-3xl"
 					 class:selected={workoutNameSelected}>
-				<input class="focus:outline-none focus:border-none bg-stone-700 p-[0.5rem]" placeholder="workout name" bind:value={TrackWorkoutState.templateName}
+				<input class="focus:outline-none focus:border-none bg-stone-700 p-[0.5rem]" placeholder="workout name"
+							 bind:value={TrackWorkoutState.templateName}
 							 onfocusin={() => workoutNameSelected = true} onfocusout={() => workoutNameSelected = false} />
 				<div>{formattedTime}</div>
 			</div>
@@ -137,7 +186,7 @@
 			{/each}
 
 			<AddExercise onExerciseCreated={refreshExercises}
-				confirmAddExercise={(exercise) => {
+									 confirmAddExercise={(exercise) => {
 				const newSet: Partial<TrackingSet> = {
 					exerciseId: exercise.id,
 					weight: 0,
@@ -148,10 +197,11 @@
 					completed: false,
 				}
 				insertSetAtOrder(newSet, setArray.length+1)
-			}}/>
+			}} />
 
 
-			<FinishWorkout setArray={setArray} exerciseRecord={exerciseRecord} weightUnit={data.user_preferences.weightUnit}/>
+			<FinishWorkout setArray={setArray} exerciseRecord={exerciseRecord}
+										 weightUnit={data.user_preferences.weightUnit} />
 		</div>
 	</div>
 
