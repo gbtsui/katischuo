@@ -64,7 +64,8 @@ export const userPrefs = pgTable("user_prefs", {
 	userId: text("user_id").notNull().unique().references(() => user.id, {onDelete: "cascade"}),
 	createdAt: timestamp("created_at").defaultNow().notNull(), //do i even need ts
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
-	weightUnit: weightUnitEnum()
+	weightUnit: weightUnitEnum(),
+	distanceUnit: distanceUnitEnum(),
 })
 
 export const trackedWeightDataPoint = pgTable("tracked_weight_data_point", {
@@ -73,6 +74,14 @@ export const trackedWeightDataPoint = pgTable("tracked_weight_data_point", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 	weight: numeric("weight"),
+})
+
+export const APIKey = pgTable("api_key", {
+	id: uuid("id").primaryKey().defaultRandom(),
+	key: text("key_id").notNull(), //hash the key when stored!!! SHA256
+	userId: text("user_id").notNull().references(() => user.id, {onDelete: "cascade"}),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	expiresAt: timestamp("expires_at").notNull(),
 })
 
 export * from './auth.schema.ts';
