@@ -7,6 +7,7 @@
 	import { formatDate, PeriodType } from '@layerstack/utils';
 	import { scaleTime } from 'd3-scale';
 	import { curveCatmullRom } from 'd3-shape';
+	import Icon from '@iconify/svelte';
 
 	let weightRecords: SelectTrackedWeightDataPoint[] = $state([]);
 	let sortedWeightRecords = $derived(
@@ -14,7 +15,6 @@
 			return (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 		})
 	);
-	console.log(sortedWeightRecords);
 
 	let selectedWeightRecord: SelectTrackedWeightDataPoint | null = $state(null);
 
@@ -55,21 +55,6 @@
 		if (!res.ok) {
 			console.error(res);
 		}
-
-		const handleDeleteWeightRecord = async () => {
-			if (!selectedWeightRecord) return;
-			let tempId = selectedWeightRecord.id
-			selectedWeightRecord = null
-			const res = await fetch(resolve('/api/delete-weight-record'), {
-				method: 'POST',
-				body: JSON.stringify({
-					id: tempId
-				})
-			})
-			if (!res.ok) console.error(res);
-			return
-		}
-
 		await updateWeightRecords();
 		weightInput = null;
 		notesInput = '';
@@ -77,10 +62,37 @@
 		trackLoading = false;
 	};
 
+	let deletingInProgress = $state(false)
+	const handleDeleteWeightRecord = async () => {
+		if (!selectedWeightRecord) return;
+		let tempId = selectedWeightRecord.id
+		selectedWeightRecord = null
+		deletingInProgress = true
+		const res = await fetch(resolve('/api/delete-weight-record'), {
+			method: 'POST',
+			body: JSON.stringify({
+				id: tempId
+			})
+		})
+		if (!res.ok) console.error(res);
+		deletingInProgress = false
+		updateWeightRecords();
+		return handleCloseModal()
+	}
+
+	let deleteModalOpen = $state(false)
+
+	const handleOpenModal = () => {
+		deleteModalOpen = true
+	}
+	const handleCloseModal = () => {
+		deleteModalOpen = false
+	}
+
+
 	const fetchWorkoutsFromDate = async (date: Date): Promise<void> => {
 		//TODO: actually implement ts in like 1 hour
 	}
-
 
 	onMount(async () => {
 		await updateWeightRecords();
@@ -218,11 +230,17 @@
 						</div>
 					{:else}
 						<div class="flex flex-col gap-[2rem]">
-							<div class="mb-4">
-								<div class="text-xs text-stone-400 mb-1">Weight Data</div>
-								<div class="text-2xl font-semibold">{new Date(selectedWeightRecord.createdAt).toLocaleString("en-CA")}</div>
-								<div class="text-3xl text-stone-400">{selectedWeightRecord.weight}lbs</div>
-								<!--<div class="text-sm text-stone-400 mt-1">{dateStr} - {timeStr}</div>-->
+							<div class="flex flex-row justify-between">
+								<div class="mb-4">
+									<div class="text-xs text-stone-400 mb-1">Weight Data</div>
+									<div class="text-2xl font-semibold">{new Date(selectedWeightRecord.createdAt).toLocaleString("en-CA")}</div>
+									<div class="text-3xl text-stone-400">{selectedWeightRecord.weight}lbs</div>
+									<!--<div class="text-sm text-stone-400 mt-1">{dateStr} - {timeStr}</div>-->
+								</div>
+								<button onclick={handleOpenModal}
+												class="cursor-pointer hover:bg-red-600 h-[2rem] w-[2rem] p-[0.5rem] transition-all">
+									<Icon icon="material-symbols:delete" />
+								</button>
 							</div>
 						</div>
 					{/if}
@@ -231,3 +249,36 @@
 		</div>
 	</div>
 </div>
+
+{#if deleteModalOpen}
+	<div class="fixed inset-0 bg-stone-900/50 flex items-center justify-center"
+			 onclick={(e) => { if (e.target === e.currentTarget) deleteModalOpen = false; }} transition:fly>
+
+		<div class="w-[75vw] h-[30vh] flex flex-col bg-stone-800 text-stone-200 shadow-lg overflow-y-auto p-6 gap-4"
+				 transition:fly>
+			<div class="flex flex-col justify-between h-full items-center">
+				<div class="flex flex-row justify-between items-center w-full ">
+					<div>
+						<div class="text-xl">
+							Are you sure you want to delete this weight record?
+						</div>
+						<div>
+							This can't be undone!
+						</div>
+					</div>
+
+					<button onclick={() => deleteModalOpen = false} class="cursor-pointer transition-all hover:text-lg">close</button>
+				</div>
+				{#if deletingInProgress}
+					<div>Deleting...</div>
+				{:else}
+					<div>
+						<button onclick={handleDeleteWeightRecord}
+										class="m-[0.5rem] p-[1rem] bg-red-600 cursor-pointer hover:text-lg transition-all">I am cleaning my data !!!
+						</button>
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
