@@ -93,3 +93,5 @@ export type InsertSet = typeof set.$inferInsert
 export type SelectWorkout = typeof workout.$inferSelect
 export type InsertWorkout = typeof workout.$inferInsert
 export type SelectUserPreferences = typeof userPrefs.$inferSelect
+export type InsertTrackedWeightDataPoint = typeof trackedWeightDataPoint.$inferInsert
+export type SelectTrackedWeightDataPoint = typeof trackedWeightDataPoint.$inferSelect

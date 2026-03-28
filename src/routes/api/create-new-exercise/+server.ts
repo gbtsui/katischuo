@@ -53,11 +53,11 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 		.where(
 			or(
 				and(
-					eq(exerciseName, exercise.exerciseName),
+					eq(exercise.exerciseName, exerciseName),
 					eq(locals.session.userId, exercise.createdByUserId)
 				),
 				and(
-					eq(exerciseName, exercise.exerciseName),
+					eq(exercise.exerciseName, exerciseName),
 					eq(exercise.isCustom, false)
 				)
 			)
