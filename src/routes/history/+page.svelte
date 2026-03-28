@@ -2,9 +2,10 @@
 	//let {data} = $props()
 	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
-	import {fly} from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import type { WorkoutWithExercises, SelectUserPreferences } from '$lib/types';
 	import HistoricalWorkoutListItem from '$lib/components/HistoricalWorkoutListItem.svelte';
+	import Icon from '@iconify/svelte';
 
 	let data: null | { allWorkouts: WorkoutWithExercises[], userPrefs: SelectUserPreferences } = $state(null);
 	let loading = $derived(data === null);
@@ -17,27 +18,53 @@
 	let selectedWorkout: WorkoutWithExercises | null = $state(null);
 
 	onMount(async () => {
-		const res = await fetch(resolve('/api/get-workout-history'));
-		console.log('wir zogen in das Feld (der Frontend)');
-		const resObj = await res.json();
-		//add err handling later
-		if (!resObj.success) console.error(resObj);
-		data = resObj.data;
+		await getWorkoutHistory()
 	});
+
+	let deleteModalOpen = $state(false);
+	let deletingInProgress = $state(false);
+
+	const handleOpenDeleteModal = () => {
+		deleteModalOpen = true;
+	};
+
+	const getWorkoutHistory = async () => {
+		const res = await fetch(resolve('/api/get-workout-history')).then(res => res.json());
+		//add err handling later
+		if (!res.success) console.error(res);
+		data = res.data;
+	}
+
+	const handleDeleteWorkout = async () => {
+		if (!selectedWorkout) return;
+
+		deletingInProgress = true;
+
+		const res = await fetch(resolve('/api/delete-workout'), {
+			method: 'POST',
+			body: JSON.stringify({ workoutId: selectedWorkout.id })
+		});
+
+		if (res.ok) deleteModalOpen = false;
+		deletingInProgress = false;
+		await getWorkoutHistory()
+		return;
+	};
 
 </script>
 
 <div
 	class="flex items-center w-[100vw] h-[100vh] flex-col align-center justify-start overflow-hidden text-stone-50 bg-stone-900 ">
 	<div class="text-2xl h-[10vh] mt-[5vh]" transition:fly>Workout History</div>
-	<a href={resolve("/dashboard")} class="absolute top-[2.5vh] left-0 w-[15vw] h-[3.5rem] bg-stone-700 text-center justify-center flex items-center hover:w-[17.5vw] hover:text-xl cursor-pointer transition-all ">Dashboard</a>
+	<a href={resolve("/dashboard")}
+		 class="absolute top-[2.5vh] left-0 w-[15vw] h-[3.5rem] bg-stone-700 text-center justify-center flex items-center hover:w-[17.5vw] hover:text-xl cursor-pointer transition-all ">Dashboard</a>
 
 	<div class="w-[80vw] h-[80vh] gap-[5vw] flex flex-row ">
 		<!--history section-->
 		<div class="w-[37.5vw] bg-stone-800 overflow-y-scroll 			[&::-webkit-scrollbar]:w-[1vw]
   [&::-webkit-scrollbar-track]:bg-stone-500
   [&::-webkit-scrollbar-thumb]:bg-stone-800
-		[&::-webkit-scrollbar]:mx-[1vw]"  transition:fly={{delay: 67*2}}>
+		[&::-webkit-scrollbar]:mx-[1vw]" transition:fly={{delay: 67*2}}>
 			<div class="flex flex-col p-[1rem] gap-[0.5rem]">
 				{#if loading || !data?.userPrefs}
 					<div>Loading your workouts...</div>
@@ -48,7 +75,7 @@
 					{#each workouts as workout, index (workout)}
 						<HistoricalWorkoutListItem workout={workout}
 																			 setSelectedWorkout={(workout: WorkoutWithExercises) => selectedWorkout = workout}
-																			 selectedWorkout={selectedWorkout} index={index}/>
+																			 selectedWorkout={selectedWorkout} index={index} />
 					{/each}
 				{/if}
 			</div>
@@ -81,10 +108,17 @@
 					{@const timeStr = startDate.toLocaleTimeString('en-CA', { hour: '2-digit', minute: '2-digit' })}
 
 					<!--header-->
-					<div class="mb-4">
-						<div class="text-xs text-stone-400 mb-1">Workout in Focus</div>
-						<div class="text-2xl font-semibold">{selectedWorkout?.name ?? 'Untitled Workout'}</div>
-						<div class="text-sm text-stone-400 mt-1">{dateStr} - {timeStr}</div>
+					<div class="flex flex-row justify-between">
+						<div class="mb-4">
+							<div class="text-xs text-stone-400 mb-1">Workout in Focus</div>
+							<div class="text-2xl font-semibold">{selectedWorkout?.name ?? 'Untitled Workout'}</div>
+							<div class="text-sm text-stone-400 mt-1">{dateStr} - {timeStr}</div>
+						</div>
+
+						<button onclick={handleOpenDeleteModal}
+										class="cursor-pointer hover:bg-red-600 h-[2rem] w-[2rem] p-[0.5rem] transition-all">
+							<Icon icon="material-symbols:delete" />
+						</button>
 					</div>
 
 					<!--stats-->
@@ -157,6 +191,36 @@
 		</div>
 	</div>
 </div>
+
+{#if deleteModalOpen}
+	<div class="fixed inset-0 bg-stone-900/20 flex items-center justify-center"
+			 onclick={(e) => { if (e.target === e.currentTarget) deleteModalOpen = false; }}>
+
+		<div class="w-[75vw] h-[30vh] flex flex-col bg-stone-800 text-stone-200 shadow-lg overflow-y-auto p-6 gap-4"
+				 transition:fly>
+			<div class="flex flex-col justify-between h-full items-center">
+				<div>
+					<div class="text-xl">
+						Are you sure you want to delete this workout?
+					</div>
+					<div>
+						This can't be undone!
+					</div>
+				</div>
+				{#if deletingInProgress}
+					<div>Deleting...</div>
+				{:else}
+					<div>
+						<button onclick={handleDeleteWorkout}
+										class="m-[0.5rem] p-[1rem] bg-red-600 cursor-pointer hover:text-lg transition-all">Purge this from
+							my sight
+						</button>
+					</div>
+				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 

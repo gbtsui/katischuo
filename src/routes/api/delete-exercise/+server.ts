@@ -1,8 +1,9 @@
-import { error, json, RequestHandler } from '@sveltejs/kit';
+import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { exercise, } from '$lib/db/schema';
+import { eq } from 'drizzle-orm';
 
-export const POST: RequestHandler = ({locals, request}) => {
+export const POST: RequestHandler = async ({locals, request}) => {
 	if (!locals.session?.userId) {
 		return error(401, {message: 'unauthorized you silly'})
 	}

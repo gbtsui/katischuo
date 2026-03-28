@@ -1,8 +1,9 @@
 import {db} from '$lib/server/db';
 import {workout} from '$lib/db/schema';
 import {json} from "@sveltejs/kit"
-import {RequestHandler} from '@sveltejs/kit';
+import type {RequestHandler} from '@sveltejs/kit';
 import {error} from '@sveltejs/kit';
+import { eq } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({request, locals}) => {
 	if (!locals.session?.userId) {
