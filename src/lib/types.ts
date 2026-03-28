@@ -9,6 +9,11 @@ export type SetWithExercise = {
 	sets: SelectSet[];
 };
 
+export type WorkoutJoinRow = {
+	workout: SelectWorkout;
+	set: SelectSet | null;
+};
+
 export type WorkoutWithExercises = SelectWorkout & {	exercises: SetWithExercise[] }
 export type WorkoutWithSets = SelectWorkout & { sets: SelectSet[] };
 
