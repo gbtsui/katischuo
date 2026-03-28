@@ -1,7 +1,7 @@
 import { error, json, type RequestHandler } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import { exercise, } from '$lib/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 export const POST: RequestHandler = async ({locals, request}) => {
 	if (!locals.session?.userId) {
@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({locals, request}) => {
 		return error(400, {message: "no exerciseId provided!"})
 	}
 
-	await db.delete(exercise).where(eq(exerciseId, exercise.id))
+	await db.delete(exercise).where(and(eq(exerciseId, exercise.id), eq(exercise.createdByUserId, locals.session.userId)))
 
 	return json({success: true})
 }

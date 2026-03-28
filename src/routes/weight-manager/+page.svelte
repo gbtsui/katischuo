@@ -5,10 +5,18 @@
 	import { onMount } from 'svelte';
 	import { Chart, Svg, Axis, Spline, Highlight, Tooltip, Area, Points } from 'layerchart';
 	import { formatDate, PeriodType } from '@layerstack/utils';
-	import {scaleTime} from "d3-scale"
-	import {curveCatmullRom} from 'd3-shape';
+	import { scaleTime } from 'd3-scale';
+	import { curveCatmullRom } from 'd3-shape';
 
 	let weightRecords: SelectTrackedWeightDataPoint[] = $state([]);
+	let sortedWeightRecords = $derived(
+		weightRecords.toSorted((a, b) => {
+			return (new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+		})
+	);
+	console.log(sortedWeightRecords);
+
+	let selectedWeightRecord: SelectTrackedWeightDataPoint | null = $state(null);
 
 	let weightInput: number | null = $state(null);
 	let notesInput: string = $state('');
@@ -48,12 +56,30 @@
 			console.error(res);
 		}
 
+		const handleDeleteWeightRecord = async () => {
+			if (!selectedWeightRecord) return;
+			let tempId = selectedWeightRecord.id
+			selectedWeightRecord = null
+			const res = await fetch(resolve('/api/delete-weight-record'), {
+				method: 'POST',
+				body: JSON.stringify({
+					id: tempId
+				})
+			})
+			if (!res.ok) console.error(res);
+			return
+		}
+
 		await updateWeightRecords();
 		weightInput = null;
 		notesInput = '';
 
 		trackLoading = false;
 	};
+
+	const fetchWorkoutsFromDate = async (date: Date): Promise<void> => {
+		//TODO: actually implement ts in like 1 hour
+	}
 
 
 	onMount(async () => {
@@ -79,8 +105,11 @@
   [&::-webkit-scrollbar-thumb]:bg-stone-800
 		[&::-webkit-scrollbar]:mx-[1vw]" transition:fly={{delay: 67*2}}>
 				<div class="flex flex-col p-[1rem] gap-[0.5rem]">
-					{#each weightRecords as record (record)}
-						<div>{JSON.stringify(record)}</div>
+					{#each sortedWeightRecords as record (record)}
+						<div class="p-[0.5rem] bg-stone-700 flex flex-row justify-between cursor-pointer hover:bg-stone-600 transition-all" onclick={() => selectedWeightRecord = record}>
+							<div>{new Date(record.createdAt).toLocaleDateString("en-CA")}</div>
+							<div>{record.weight}lbs</div>
+						</div>
 					{/each}
 
 					{#if !weightRecords.length}
@@ -120,12 +149,12 @@
       }} />
 
 							<Area line={{ class: "stroke-stone-400 stroke-[1.5px]" }}
-										class="fill-stone-400/10" curve={curveCatmullRom}/>
+										class="fill-stone-400/10" curve={curveCatmullRom} />
 
 							<Spline class="stroke-[1.5px] stroke-stone-400 fill-none"
 											curve={curveCatmullRom}
 							/>
-							<Points class="stroke-stone-400 fill-stone-300"/>
+							<Points class="stroke-stone-400 fill-stone-300" />
 							<Highlight
 								points={{ class: "fill-stone-400 stroke-none r-[3]" }}
 								lines={{ class: "stroke-stone-600" }} />
@@ -154,37 +183,48 @@
 
 		<!--track weight section-->
 		<div class="flex flex-col gap-[1rem]">
-			<div>Track Weight</div>
+			<div class="text-xl">Track</div>
 			<div class="w-[37.5vw] h-[62.5vh] bg-stone-800 overflow-y-scroll [&::-webkit-scrollbar]:w-[1vw]
 [&::-webkit-scrollbar-track]:bg-stone-500
 [&::-webkit-scrollbar-thumb]:bg-stone-800
 [&::-webkit-scrollbar]:mx-[1vw]" transition:fly={{delay: 67}}>
 				<div class="p-[2rem] flex flex-col gap-[2rem] justify-between ">
-					<div class="flex flex-col gap-[2rem]">
-						<div>
-							<div>Current Weight</div>
-							<input bind:value={weightInput} type="number" placeholder="100.0"
-										 class="bg-stone-700 focus:border-none focus:outline-none" />
-							<select class="bg-stone-700" bind:value={weightUnitInput}>
-								<option value="lbs">lbs</option>
-								<option value="kg">kg</option>
-							</select>
+					{#if !selectedWeightRecord}
+						<div class="flex flex-col gap-[2rem]">
+							<div>
+								<div>Current Weight</div>
+								<input bind:value={weightInput} type="number" placeholder="100.0"
+											 class="bg-stone-700 focus:border-none focus:outline-none" />
+								<select class="bg-stone-700" bind:value={weightUnitInput}>
+									<option value="lbs">lbs</option>
+									<option value="kg">kg</option>
+								</select>
+							</div>
+							<div>
+								<div>Notes</div>
+								<textarea bind:value={notesInput}
+													class="bg-stone-700 resize-none field-sizing-content min-h-[5rem] max-h-[30rem] w-full"></textarea>
+							</div>
+							{#if !trackLoading}
+								<div>
+									<button
+										class="p-[1rem]  hover:text-2xl transition-all text-xl {weightInput === null || weightInput === 0 ?  'bg-stone-900 cursor-not-allowed text-stone-400' : 'bg-stone-700 hover:p-[1.5rem] cursor-pointer' }"
+										onclick={handleRecordWeight}>Track!
+									</button>
+								</div>
+							{:else }
+								<div>Loading...</div>
+							{/if}
 						</div>
-						<div>
-							<div>Notes</div>
-							<textarea bind:value={notesInput}
-												class="bg-stone-700 resize-none field-sizing-content min-h-[5rem] max-h-[30rem] w-full"></textarea>
+					{:else}
+						<div class="flex flex-col gap-[2rem]">
+							<div class="mb-4">
+								<div class="text-xs text-stone-400 mb-1">Weight Data</div>
+								<div class="text-2xl font-semibold">{new Date(selectedWeightRecord.createdAt).toLocaleString("en-CA")}</div>
+								<div class="text-3xl text-stone-400">{selectedWeightRecord.weight}lbs</div>
+								<!--<div class="text-sm text-stone-400 mt-1">{dateStr} - {timeStr}</div>-->
+							</div>
 						</div>
-					</div>
-					{#if !trackLoading}
-						<div>
-							<button
-								class="p-[1rem]  hover:text-2xl transition-all text-xl {weightInput === null || weightInput === 0 ?  'bg-stone-900 cursor-not-allowed text-stone-400' : 'bg-stone-700 hover:p-[1.5rem] cursor-pointer' }"
-								onclick={handleRecordWeight}>Track!
-							</button>
-						</div>
-					{:else }
-						<div>Loading...</div>
 					{/if}
 				</div>
 			</div>
