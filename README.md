@@ -1,42 +1,28 @@
-# sv
+# katischuo
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+## κατισχύω
+> *v.* To overpower, to prevail, to be strong against, to overcome.
 
-## Creating a project
+An extendable gym tracking app/API, intended to be both minimalist and maximalist at the same time.
+Built under time crunch for my Campfire Flagship stipend hours, so it's not the most polished or 
+finished. However, in its current state, it is (mostly) functional and all core functionalities are
+here.
 
-If you're seeing this, you've probably already done this step. Congrats!
+API keys have not yet been implemented, therefore so far all APIs are internal only. I plan to change this
+as soon as I can. 
 
-```sh
-# create a new project
-npx sv create my-app
+# API Reference
+## GET /api/bismarck
+Will return the first 2 lines of Bismarck by Sabaton.
+### Arguments
+None
+### Response
+```
+{
+    body: "From the mist, a shape, a ship is taking form / And the silence of the sea is about to drift into a storm\n"
+}
 ```
 
-To recreate this project with the same configuration:
+## POST /api/create-new-exercise
 
-```sh
-# recreate this project
-npx sv@0.12.5 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:typography" sveltekit-adapter="adapter:auto" drizzle="database:postgresql+postgresql:postgres.js+docker:no" better-auth="demo:password,github" mdsvex --install npm katischuo
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+ykw im writing this documentation later
