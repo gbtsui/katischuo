@@ -22,11 +22,13 @@ export const POST: RequestHandler = async ({locals, request}) => {
 	const KG_TO_LBS = 2.20462;
 
 	const canonicalWeight = data.weightUnit === "lbs" ? data.weight : data.weight * KG_TO_LBS
+	const notes = data.notes
 
 	try {
 		await db.insert(trackedWeightDataPoint).values({
 			userId: locals.session.userId,
-			weight: canonicalWeight
+			weight: canonicalWeight,
+			notes
 		})
 	} catch (err) {
 		console.error(err)

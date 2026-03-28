@@ -74,6 +74,7 @@ export const trackedWeightDataPoint = pgTable("tracked_weight_data_point", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
 	weight: numeric("weight"),
+	notes: text("notes")
 })
 
 export const APIKey = pgTable("api_key", {
