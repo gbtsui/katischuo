@@ -8,6 +8,7 @@
 	import { scaleTime } from 'd3-scale';
 	import { curveCatmullRom } from 'd3-shape';
 	import Icon from '@iconify/svelte';
+	import type { WorkoutWithExercises } from '$lib/types';
 
 	let weightRecords: SelectTrackedWeightDataPoint[] = $state([]);
 	let sortedWeightRecords = $derived(
@@ -62,37 +63,50 @@
 		trackLoading = false;
 	};
 
-	let deletingInProgress = $state(false)
+	let deletingInProgress = $state(false);
 	const handleDeleteWeightRecord = async () => {
 		if (!selectedWeightRecord) return;
-		let tempId = selectedWeightRecord.id
-		selectedWeightRecord = null
-		deletingInProgress = true
+		let tempId = selectedWeightRecord.id;
+		selectedWeightRecord = null;
+		deletingInProgress = true;
 		const res = await fetch(resolve('/api/delete-weight-record'), {
 			method: 'POST',
 			body: JSON.stringify({
 				id: tempId
 			})
-		})
+		});
 		if (!res.ok) console.error(res);
-		deletingInProgress = false
+		deletingInProgress = false;
 		updateWeightRecords();
-		return handleCloseModal()
-	}
+		return handleCloseModal();
+	};
 
-	let deleteModalOpen = $state(false)
+	let deleteModalOpen = $state(false);
 
 	const handleOpenModal = () => {
-		deleteModalOpen = true
-	}
+		deleteModalOpen = true;
+	};
 	const handleCloseModal = () => {
-		deleteModalOpen = false
-	}
+		deleteModalOpen = false;
+	};
 
+	const handleSelectWeightRecord = (record: SelectTrackedWeightDataPoint) => {
+		selectedWeightRecord = record;
+		fetchWorkoutsFromDate(record.createdAt);
+	};
+
+	let workoutsData: WorkoutWithExercises[] = $state([]);
 
 	const fetchWorkoutsFromDate = async (date: Date): Promise<void> => {
 		//TODO: actually implement ts in like 1 hour
-	}
+
+		const dateAsString = new Date(date).toISOString();
+		const res = await fetch(resolve(`/api/get-workout-history?on=${dateAsString}`))
+			.then(res => res.json()).then(res => res.data);
+
+		console.log(res);
+		workoutsData = res.allWorkouts;
+	};
 
 	onMount(async () => {
 		await updateWeightRecords();
@@ -118,7 +132,9 @@
 		[&::-webkit-scrollbar]:mx-[1vw]" transition:fly={{delay: 67*2}}>
 				<div class="flex flex-col p-[1rem] gap-[0.5rem]">
 					{#each sortedWeightRecords as record (record)}
-						<div class="p-[0.5rem] bg-stone-700 flex flex-row justify-between cursor-pointer hover:bg-stone-600 transition-all" onclick={() => selectedWeightRecord = record}>
+						<div
+							class="p-[0.5rem] bg-stone-700 flex flex-row justify-between cursor-pointer hover:bg-stone-600 transition-all"
+							onclick={() => handleSelectWeightRecord(record)}>
 							<div>{new Date(record.createdAt).toLocaleDateString("en-CA")}</div>
 							<div>{record.weight}lbs</div>
 						</div>
@@ -200,7 +216,7 @@
 [&::-webkit-scrollbar-track]:bg-stone-500
 [&::-webkit-scrollbar-thumb]:bg-stone-800
 [&::-webkit-scrollbar]:mx-[1vw]" transition:fly={{delay: 67}}>
-				<div class="p-[2rem] flex flex-col gap-[2rem] justify-between ">
+				<div class="p-[2rem] flex flex-col gap-[2rem] justify-between">
 					{#if !selectedWeightRecord}
 						<div class="flex flex-col gap-[2rem]">
 							<div>
@@ -233,7 +249,8 @@
 							<div class="flex flex-row justify-between">
 								<div class="mb-4">
 									<div class="text-xs text-stone-400 mb-1">Weight Data</div>
-									<div class="text-2xl font-semibold">{new Date(selectedWeightRecord.createdAt).toLocaleString("en-CA")}</div>
+									<div
+										class="text-2xl font-semibold">{new Date(selectedWeightRecord.createdAt).toLocaleString("en-CA")}</div>
 									<div class="text-3xl text-stone-400">{selectedWeightRecord.weight}lbs</div>
 									<!--<div class="text-sm text-stone-400 mt-1">{dateStr} - {timeStr}</div>-->
 								</div>
@@ -241,6 +258,28 @@
 												class="cursor-pointer hover:bg-red-600 h-[2rem] w-[2rem] p-[0.5rem] transition-all">
 									<Icon icon="material-symbols:delete" />
 								</button>
+							</div>
+
+							<div class="flex flex-col gap-[0.5rem]">
+								{#if workoutsData.length === 0}
+									<div>
+										No workouts tracked on this day.
+									</div>
+								{:else}
+									<div>
+										Workouts on this day
+									</div>
+								{/if}
+								{#each workoutsData as workout (workout)}
+									<!--
+									<div class="text-xs">
+										{JSON.stringify(workout)}
+									</div>
+									-->
+									<div class="p-[0.5rem] bg-stone-700">
+										{workout.name}
+									</div>
+								{/each}
 							</div>
 						</div>
 					{/if}
@@ -267,14 +306,16 @@
 						</div>
 					</div>
 
-					<button onclick={() => deleteModalOpen = false} class="cursor-pointer transition-all hover:text-lg">close</button>
+					<button onclick={() => deleteModalOpen = false} class="cursor-pointer transition-all hover:text-lg">close
+					</button>
 				</div>
 				{#if deletingInProgress}
 					<div>Deleting...</div>
 				{:else}
 					<div>
 						<button onclick={handleDeleteWeightRecord}
-										class="m-[0.5rem] p-[1rem] bg-red-600 cursor-pointer hover:text-lg transition-all">I am cleaning my data !!!
+										class="m-[0.5rem] p-[1rem] bg-red-600 cursor-pointer hover:text-lg transition-all">I am cleaning my
+							data !!!
 						</button>
 					</div>
 				{/if}
