@@ -2,8 +2,9 @@
 	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
+	import type { OneRepMax } from '$lib/types';
 
-	let oneRepMaxes: Record<string, { epley: number, brzycki: number }>[] | null = $state(null);
+	let oneRepMaxes: Record<string, OneRepMax>[] | null = $state(null);
 	let maxVolumes: Record<string, number>[] | null = $state(null);
 	let maxReps: Record<string, number> [] | null = $state(null);
 
