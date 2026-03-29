@@ -9,6 +9,7 @@
 	import { curveCatmullRom } from 'd3-shape';
 	import Icon from '@iconify/svelte';
 	import type { WorkoutWithExercises } from '$lib/types';
+	import WorkoutSummaryExpandable from '$lib/components/WorkoutSummaryExpandable.svelte';
 
 	let weightRecords: SelectTrackedWeightDataPoint[] = $state([]);
 	let sortedWeightRecords = $derived(
@@ -276,9 +277,7 @@
 										{JSON.stringify(workout)}
 									</div>
 									-->
-									<div class="p-[0.5rem] bg-stone-700">
-										{workout.name}
-									</div>
+									<WorkoutSummaryExpandable workout={workout} userPrefs={}/>
 								{/each}
 							</div>
 						</div>
