@@ -64,8 +64,8 @@ export const userPrefs = pgTable("user_prefs", {
 	userId: text("user_id").notNull().unique().references(() => user.id, {onDelete: "cascade"}),
 	createdAt: timestamp("created_at").defaultNow().notNull(), //do i even need ts
 	updatedAt: timestamp("updated_at").defaultNow().notNull(),
-	weightUnit: weightUnitEnum(),
-	distanceUnit: distanceUnitEnum(),
+	weightUnit: weightUnitEnum().default("lbs").notNull(),
+	distanceUnit: distanceUnitEnum().default("km").notNull(),
 })
 
 export const trackedWeightDataPoint = pgTable("tracked_weight_data_point", {
