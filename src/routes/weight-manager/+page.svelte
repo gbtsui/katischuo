@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fly } from 'svelte/transition';
 	import { resolve } from '$app/paths';
-	import type { SelectTrackedWeightDataPoint } from '$lib/db/schema.js';
+	import type { SelectTrackedWeightDataPoint, SelectUserPreferences } from '$lib/db/schema.js';
 	import { onMount } from 'svelte';
 	import { Chart, Svg, Axis, Spline, Highlight, Tooltip, Area, Points } from 'layerchart';
 	import { formatDate, PeriodType } from '@layerstack/utils';
@@ -22,6 +22,7 @@
 
 	let weightInput: number | null = $state(null);
 	let notesInput: string = $state('');
+	let userPrefs: null | SelectUserPreferences = $state(null)
 	let weightUnitInput: 'lbs' | 'kg' = $state('lbs'); //TODO: add function to query for actual preferred weight unit
 
 	let trackLoading = $state(false);
@@ -40,6 +41,12 @@
 		const res = await fetch(resolve('/api/get-weight-records')).then(res => res.json());
 		weightRecords = res.records;
 	};
+
+	const updateUserPreferences = async () => {
+		const res = await fetch(resolve("/api/get-user-preferences")).then(res => res.json());
+		userPrefs = res.userPrefs
+		weightUnitInput = userPrefs?.weightUnit ?? "lbs"
+	}
 
 
 	const handleRecordWeight = async () => {
@@ -111,6 +118,7 @@
 
 	onMount(async () => {
 		await updateWeightRecords();
+		await updateUserPreferences();
 	});
 
 	//okay like i guess bro
@@ -277,7 +285,7 @@
 										{JSON.stringify(workout)}
 									</div>
 									-->
-									<WorkoutSummaryExpandable workout={workout} userPrefs={}/>
+									<WorkoutSummaryExpandable workout={workout} userPrefs={userPrefs}/>
 								{/each}
 							</div>
 						</div>
