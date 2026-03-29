@@ -28,19 +28,19 @@
 	let cardioTimeMinutes = $derived(Math.round(cardioTimeSeconds / 60));
 	let cardioTimeHours = $derived(Math.floor(cardioTimeSeconds / 3600));
 
-	let lastTrackedWeight = $state(0);
-	let lastTrackedWeightTime = $state(new Date()); //guhh change this later..
+	let lastTrackedWeight: number | null = $state(null);
+	let lastTrackedWeightTime: null | Date = $state(null); //guhh change this later..
 
 	let rightSideVisible = $state(false);
 
 	const updateLastTrackedWeight = async () => {
-		const res = await fetch(resolve("/api/get-weight-records?limit=1&order=desc"), {method: "GET"})
-		.then(res => res.json()).then((data) => data.records[0])
+		const res = await fetch(resolve('/api/get-weight-records?limit=1&order=desc'), { method: 'GET' })
+			.then(res => res.json()).then((data) => data.records[0]);
 
-		console.log(res)
-		lastTrackedWeight = res.weight
-		lastTrackedWeightTime = new Date(res.createdAt)
-	}
+		console.log(res);
+		lastTrackedWeight = res.weight;
+		lastTrackedWeightTime = new Date(res.createdAt);
+	};
 
 	onMount(() => {
 		rightSideVisible = true;
@@ -69,7 +69,10 @@
 
 			<!--also need to insert streaks, etc-->
 			<div class="flex flex-col items-center gap-[2.5vh]">
-				<div class="bg-stone-800 border border-stone-700 w-1/2 h-[4vh] text-xl justify-center flex items-center  text-center align-center">This Week</div>
+				<div
+					class="bg-stone-800 border border-stone-700 w-1/2 h-[4vh] text-xl justify-center flex items-center  text-center align-center">
+					This Week
+				</div>
 				<div class="w-full h-[10vh] flex flex-row gap-[2vw] items-center align-center justify-center">
 					<!--streak counter-->
 					<div class="w-[10vh] h-[10vh] bg-stone-700 text-stone-100 flex flex-col justify-center items-center">
@@ -128,7 +131,9 @@
 				>
 					<div class="text-5xl">
 						<div class="text-stone-500 text-3xl">
-							last tracked weight: {lastTrackedWeight}{volumeUnit} @ {lastTrackedWeightTime.toLocaleString("en-CA")}
+							{#if lastTrackedWeightTime && lastTrackedWeight}
+								last tracked weight: {lastTrackedWeight}{volumeUnit} @ {lastTrackedWeightTime.toLocaleString("en-CA")}
+							{/if}
 						</div>
 						<div>track weight</div>
 					</div>
@@ -140,15 +145,17 @@
 				>
 					<!--history-->
 					<!--HOW DID I FORGET HISTORY???-->
-					<a class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
-							 transition:fly={{x: "50vw", duration: 1000, delay: 67*2}} href={resolve("/history")}>
+					<a
+						class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
+						transition:fly={{x: "50vw", duration: 1000, delay: 67*2}} href={resolve("/history")}>
 						<div>history</div>
 					</a>
 
 					<!--PRs-->
 					<!--gladius roma belisarius sum.-->
-					<div class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
-							 transition:fly={{x: "50vw", duration: 1000, delay: 67*3}}>
+					<div
+						class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
+						transition:fly={{x: "50vw", duration: 1000, delay: 67*3}}>
 						<div>records</div>
 					</div>
 				</div>
@@ -167,7 +174,7 @@
 
 				<!--settings-->
 				<div
-					class="right-0 h-[20vh] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-row gap-[2.5vw]">
+					class="right-0 h-[20vh] p-[2rem] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-row gap-[2.5vw]">
 					<div class="text-xl">
 						settings
 						<!--i might actually want to make this one smaller and just a cog?-->
