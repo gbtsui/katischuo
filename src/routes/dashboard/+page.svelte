@@ -153,11 +153,11 @@
 
 					<!--PRs-->
 					<!--gladius roma belisarius sum.-->
-					<div
+					<a
 						class="bg-stone-800 border border-stone-700 h-[10vh] w-[20vw] hover:translate-x-[-2.5vw] transition-all hover:border-emerald-400 text-center align-center items-center justify-center cursor-pointer flex text-2xl"
-						transition:fly={{x: "50vw", duration: 1000, delay: 67*3}}>
+						transition:fly={{x: "50vw", duration: 1000, delay: 67*3}} href={resolve("/records")}>
 						<div>records</div>
-					</div>
+					</a>
 				</div>
 
 				<div
