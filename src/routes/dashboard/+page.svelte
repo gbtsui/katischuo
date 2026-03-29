@@ -4,6 +4,16 @@
 	import idlePath from '$lib/assets/idle.GIF';
 	import { resolve } from '$app/paths';
 
+	/*TODO:
+		fix cardio goobery
+		display proper fields based on exercise type
+		calculate volume based on bodyweight and other goobs
+		calculate streak!!
+		yeah thats about it for dashboard i think
+
+		ENTIRE STATS PAGE AND SETTINGS UAGHHHHHHH
+	 */
+
 	let currentTime: Date = $state(new Date);
 
 	let currentHour = $derived(currentTime.getHours());
@@ -23,8 +33,18 @@
 
 	let rightSideVisible = $state(false);
 
+	const updateLastTrackedWeight = async () => {
+		const res = await fetch(resolve("/api/get-weight-records?limit=1&order=desc"), {method: "GET"})
+		.then(res => res.json()).then((data) => data.records[0])
+
+		console.log(res)
+		lastTrackedWeight = res.weight
+		lastTrackedWeightTime = new Date(res.createdAt)
+	}
+
 	onMount(() => {
 		rightSideVisible = true;
+		updateLastTrackedWeight();
 
 		const interval = setInterval(() => {
 			currentTime = new Date();
@@ -108,7 +128,7 @@
 				>
 					<div class="text-5xl">
 						<div class="text-stone-500 text-3xl">
-							last tracked weight: {lastTrackedWeight}{volumeUnit} @ {lastTrackedWeightTime.getHours()}:{lastTrackedWeightTime.getMinutes()}  {lastTrackedWeightTime.getFullYear()}/{lastTrackedWeightTime.getMonth()}/{lastTrackedWeightTime.getDate()}
+							last tracked weight: {lastTrackedWeight}{volumeUnit} @ {lastTrackedWeightTime.toLocaleString("en-CA")}
 						</div>
 						<div>track weight</div>
 					</div>

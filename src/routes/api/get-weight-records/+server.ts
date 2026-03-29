@@ -10,13 +10,12 @@ export const GET: RequestHandler = async ({locals, url}) => {
 
 	const dateParams = parseDateParams(url)
 	const paginationParams = parsePaginationParams(url)
-	const result = getDbWeightRecordsByDateRange(locals.session.userId, dateParams, paginationParams)
+	const result = await getDbWeightRecordsByDateRange(locals.session.userId, dateParams, paginationParams)
 
 
 	//might take a request of "how many days to look back" but for now just return EVERYTHING
 
 	//const result = await db.select().from(trackedWeightDataPoint).where(eq(trackedWeightDataPoint.userId, locals.session.userId))
-
 	return json({success: true, records: result})
 }
 
