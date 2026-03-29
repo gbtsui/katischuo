@@ -47,5 +47,5 @@ function parseExerciseId(url: URL) {
 	const exerciseIdsRaw = url.searchParams.get('exerciseId');
 	if (!exerciseIdsRaw) return [];
 
-	return exerciseIdsRaw.split(',').slice(20);
+	return exerciseIdsRaw.split(',').slice(0, 20);
 }
