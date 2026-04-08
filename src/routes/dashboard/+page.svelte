@@ -160,6 +160,7 @@
 					</a>
 				</div>
 
+				<!--
 				<div
 					class="right-0 w-[45vw] h-[15vh] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-col hover:translate-x-[-5vw] transition-all hover:border-emerald-400"
 					transition:fly={{x: "50vw", duration: 1000, delay: 67*4}}>
@@ -168,18 +169,24 @@
 					</div>
 				</div>
 
+				-->
+
 
 				<!--stats-->
 				<!--make this later but it should be like a big thing and display-->
 
 				<!--settings-->
+
+				<!--
 				<div
 					class="right-0 h-[20vh] p-[2rem] bg-stone-800 border border-stone-700 text-center align-center items-center justify-center cursor-pointer flex flex-row gap-[2.5vw]">
 					<div class="text-xl">
 						settings
-						<!--i might actually want to make this one smaller and just a cog?-->
+						i might actually want to make this one smaller and just a cog?
 					</div>
 				</div>
+
+		-->
 			</div>
 		</div>
 	{/if}
