@@ -1,5 +1,29 @@
 # katischuo
 
+```
+NOTE FOR USERS AND REVIEWERS
+
+This app is not in a fully finished state! Admittedly,
+I got severely burned out over the past few weeks,
+so not all functionality has been implemented.
+All core functionality needed for it to be *functional* is there,
+but there are occasional visual bugs which I might have forgotten.
+Please remind me on Slack or make an issue if there's something that needs to be fixed.
+
+Je vous remercie beaucoup!
+
+This is also an app that I personally use often,
+so if something's broken and I need to fix it,
+I will notice.
+
+I don't like using broken things very much
+but I'm also tired
+so I'll fix it at some point
+
+Thanks!
+
+```
+
 ## κατισχύω
 > *v.* To overpower, to prevail, to be strong against, to overcome.
 
