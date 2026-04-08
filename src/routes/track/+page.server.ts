@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({locals}) => {
 	let user_preferences = await db
 		.selectDistinct()
 		.from(userPrefs)
-		.where(eq(session.userId, userPrefs.userId))
+		.where(eq(userPrefs.userId, session.userId))
 
 	console.log(user_preferences)
 
